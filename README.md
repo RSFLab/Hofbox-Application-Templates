@@ -1,0 +1,1 @@
+# Hofbox-Application-Templates
