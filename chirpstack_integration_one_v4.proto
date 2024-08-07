@@ -1,0 +1,3678 @@
+syntax = "proto3";
+
+package integration;
+
+option go_package = "github.com/brocaar/chirpstack/api/go/v4/integration";
+option java_package = "io.chirpstack.api.integration";
+option java_multiple_files = true;
+option java_outer_classname = "IntegrationProto";
+option csharp_namespace = "Chirpstack.Integration";
+
+
+// import "google/protobuf/timestamp.proto";
+
+message Timestamp {
+  // Represents seconds of UTC time since Unix epoch
+  // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+  // 9999-12-31T23:59:59Z inclusive.
+  int64 seconds = 1;
+
+  // Non-negative fractions of a second at nanosecond resolution. Negative
+  // second values with fractions must still have non-negative nanos values
+  // that count forward in time. Must be from 0 to 999,999,999
+  // inclusive.
+  int32 nanos = 2;
+}
+
+
+// import "google/protobuf/struct.proto";
+
+// The JSON representation for `Struct` is JSON object.
+message Struct {
+  // Unordered map of dynamically typed values.
+  map<string, Value> fields = 1;
+}
+
+// `Value` represents a dynamically typed value which can be either
+// null, a number, a string, a boolean, a recursive struct value, or a
+// list of values. A producer of value is expected to set one of these
+// variants. Absence of any variant indicates an error.
+//
+// The JSON representation for `Value` is JSON value.
+message Value {
+  // The kind of value.
+  oneof kind {
+    // Represents a null value.
+    NullValue null_value = 1;
+    // Represents a double value.
+    double number_value = 2;
+    // Represents a string value.
+    string string_value = 3;
+    // Represents a boolean value.
+    bool bool_value = 4;
+    // Represents a structured value.
+    Struct struct_value = 5;
+    // Represents a repeated `Value`.
+    ListValue list_value = 6;
+  }
+}
+
+// `NullValue` is a singleton enumeration to represent the null value for the
+// `Value` type union.
+//
+// The JSON representation for `NullValue` is JSON `null`.
+enum NullValue {
+  // Null value.
+  NULL_VALUE = 0;
+}
+
+// `ListValue` is a wrapper around a repeated field of values.
+//
+// The JSON representation for `ListValue` is JSON array.
+message ListValue {
+  // Repeated field of dynamically typed values.
+  repeated Value values = 1;
+}
+
+
+// google/protobuf/empty.proto
+
+message Empty {}
+
+
+// google/protobuf/duration.proto
+
+message Duration {
+  // Signed seconds of the span of time. Must be from -315,576,000,000
+  // to +315,576,000,000 inclusive. Note: these bounds are computed from:
+  // 60 sec/min * 60 min/hr * 24 hr/day * 365.25 days/year * 10000 years
+  int64 seconds = 1;
+
+  // Signed fractions of a second at nanosecond resolution of the span
+  // of time. Durations less than one second are represented with a 0
+  // `seconds` field and a positive or negative `nanos` field. For durations
+  // of one second or more, a non-zero value for the `nanos` field must be
+  // of the same sign as the `seconds` field. Must be from -999,999,999
+  // to +999,999,999 inclusive.
+  int32 nanos = 2;
+}
+
+//
+
+enum LogLevel {
+  // Info.
+  INFO = 0;
+
+  // Warning.
+  WARNING = 1;
+
+  // Error.
+  ERROR = 2;
+}
+
+enum LogCode {
+  // Unknown type.
+  UNKNOWN = 0;
+
+  // Error related to the downlink payload size.
+  // Usually seen when the payload exceeded the maximum allowed payload size.
+  DOWNLINK_PAYLOAD_SIZE = 1;
+
+  // Uplink codec error.
+  UPLINK_CODEC = 2;
+
+  // Downlink codec error.
+  DOWNLINK_CODEC = 3;
+
+  // OTAA error.
+  OTAA = 4;
+
+  // Uplink frame-counter was reset.
+  UPLINK_F_CNT_RESET = 5;
+
+  // Uplink MIC error.
+  UPLINK_MIC = 6;
+
+  // Uplink frame-counter retransmission.
+  UPLINK_F_CNT_RETRANSMISSION = 7;
+
+  // Downlink gateway error.
+  DOWNLINK_GATEWAY = 8;
+
+  // Relay new end-device.
+  RELAY_NEW_END_DEVICE = 9;
+
+  // Downlink frame-counter.
+  F_CNT_DOWN = 10;
+}
+
+// Device information.
+message DeviceInfo {
+  // Tenant ID (UUID).
+  string tenant_id = 1;
+
+  // Tenant name.
+  string tenant_name = 2;
+
+  // Application ID (UUID).
+  string application_id = 3;
+
+  // Application name.
+  string application_name = 4;
+
+  // Device-profile ID (UUID).
+  string device_profile_id = 5;
+
+  // Device-profile name.
+  string device_profile_name = 6;
+
+  // Device name.
+  string device_name = 7;
+
+  // Device EUI.
+  string dev_eui = 8;
+
+  // Device class.
+  common.DeviceClass device_class_enabled = 10;
+
+  // Device-profile and device tags.
+  map<string, string> tags = 9;
+}
+
+// Uplink relay RX information.
+message UplinkRelayRxInfo {
+  // Relay DevEUI.
+  string dev_eui = 1;
+
+  // Frequency.
+  uint32 frequency = 2;
+
+  // Data-rate.
+  uint32 dr = 3;
+
+  // SNR.
+  int32 snr = 4;
+
+  // RSSI.
+  int32 rssi = 5;
+
+  // WOR channel.
+  uint32 wor_channel = 6;
+}
+
+// UplinkEvent is the message sent when an uplink payload has been received.
+message UplinkEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device information.
+  DeviceInfo device_info = 3;
+
+  // Device address.
+  string dev_addr = 4;
+
+  // Device has ADR bit set.
+  bool adr = 5;
+
+  // Data-rate.
+  uint32 dr = 6;
+
+  // Frame counter.
+  uint32 f_cnt = 7;
+
+  // Frame port.
+  uint32 f_port = 8;
+
+  // Uplink was of type confirmed.
+  bool confirmed = 9;
+
+  // FRMPayload data.
+  bytes data = 10;
+
+  // Note that this is only set when a codec is configured in the Device
+  // Profile.
+  Struct object = 11;
+
+  // Receiving gateway RX info.
+  repeated gw.UplinkRxInfo rx_info = 12;
+
+  // TX info.
+  gw.UplinkTxInfo tx_info = 13;
+
+  // Relay info.
+  UplinkRelayRxInfo relay_rx_info = 14;
+
+  // Join-Server context.
+  // A non-empty value indicatest that ChirpStack does not have access to
+  // the AppSKey and that the encryption / decryption of the payloads is
+  // the responsibility of the end-application.
+  common.JoinServerContext join_server_context = 15;
+}
+
+// JoinEvent is the message sent when a device joined the network.
+// Note: this event is sent at the first uplink after OTAA.
+message JoinEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // Device address.
+  string dev_addr = 4;
+
+  // Relay info.
+  UplinkRelayRxInfo relay_rx_info = 5;
+
+  // Join-Server context.
+  // A non-empty value indicatest that ChirpStack does not have access to
+  // the AppSKey and that the encryption / decryption of the payloads is
+  // the responsibility of the end-application.
+  common.JoinServerContext join_server_context = 6;
+}
+
+// AckEvent is the message sent when a confirmation on a confirmed downlink
+// has been received -or- when the downlink timed out.
+message AckEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // Downlink queue item ID (UUID).
+  string queue_item_id = 4;
+
+  // Frame was acknowledged.
+  bool acknowledged = 5;
+
+  // Downlink frame counter to which the acknowledgement relates.
+  uint32 f_cnt_down = 6;
+}
+
+// TxAckEvent is the message sent when a downlink was acknowledged by the
+// gateway for transmission. As a downlink can be scheduled in the future, this
+// event does not confirm that the message has already been transmitted.
+message TxAckEvent {
+  // Downlink ID.
+  uint32 downlink_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // Downlink queue item ID (UUID).
+  string queue_item_id = 4;
+
+  // Downlink frame-counter.
+  uint32 f_cnt_down = 5;
+
+  // Gateway ID.
+  string gateway_id = 6;
+
+  // TX info.
+  gw.DownlinkTxInfo tx_info = 7;
+}
+
+// LogEvent is the message sent when a device-related log was sent.
+message LogEvent {
+  // Timestamp.
+  Timestamp time = 1;
+
+  // Device info.
+  DeviceInfo device_info = 2;
+
+  // Log level.
+  LogLevel level = 3;
+
+  // Log code.
+  LogCode code = 4;
+
+  // Description message.
+  string description = 5;
+
+  // Context map.
+  map<string, string> context = 6;
+}
+
+// StatusEvent is the message sent when a device-status mac-command was sent
+// by the device.
+message StatusEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // The demodulation signal-to-noise ratio in dB for the last successfully
+  // received device-status request by the Network Server.
+  int32 margin = 5;
+
+  // Device is connected to an external power source.
+  bool external_power_source = 6;
+
+  // Battery level is not available.
+  bool battery_level_unavailable = 7;
+
+  // Battery level.
+  float battery_level = 8;
+}
+
+// LocationEvent is the message sent when a geolocation resolve was returned.
+message LocationEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // Location.
+  common.Location location = 4;
+}
+
+// IntegrationEvent is the message that can be sent by an integration.
+// It allows for sending events which are provided by an external integration
+// which are "not native" to ChirpStack.
+message IntegrationEvent {
+  // Deduplication ID (UUID).
+  string deduplication_id = 1;
+
+  // Timestamp.
+  Timestamp time = 2;
+
+  // Device info.
+  DeviceInfo device_info = 3;
+
+  // Integration name.
+  string integration_name = 4;
+
+  // Event type.
+  string event_type = 5;
+
+  // Struct containing the event object.
+  Struct object = 6;
+}
+
+// DownlinkCommand is the command to enqueue a downlink payload for the given
+// device.
+message DownlinkCommand {
+  // ID (UUID).
+  // If left blank, a random UUID will be generated.
+  string id = 1;
+
+  // Device EUI (EUI64).
+  string dev_eui = 2;
+
+  // Confirmed.
+  bool confirmed = 3;
+
+  // FPort (must be > 0).
+  uint32 f_port = 4;
+
+  // Data.
+  // Or use the json_object field when a codec has been configured.
+  bytes data = 5;
+
+  // Only use this when a codec has been configured that can encode this
+  // object to bytes.
+  Struct object = 6;
+}
+
+message integration {
+    enum LogLevel {
+        INFO  = 0;
+        WARNING  = 1;
+        ERROR  = 2;
+    }
+
+    enum LogCode {
+        UNKNOWN  = 0;
+        DOWNLINK_PAYLOAD_SIZE  = 1;
+        UPLINK_CODEC  = 2;
+        DOWNLINK_CODEC  = 3;
+        OTAA  = 4;
+        UPLINK_F_CNT_RESET  = 5;
+        UPLINK_MIC  = 6;
+        UPLINK_F_CNT_RETRANSMISSION  = 7;
+        DOWNLINK_GATEWAY  = 8;
+        RELAY_NEW_END_DEVICE  = 9;
+        F_CNT_DOWN  = 10;
+    }
+
+    message DeviceInfo {
+        string tenant_id = 1;
+        string tenant_name = 2;
+        string application_id = 3;
+        string application_name = 4;
+        string device_profile_id = 5;
+        string device_profile_name = 6;
+        string device_name = 7;
+        string dev_eui = 8;
+        map<string,string> tags = 9;
+        common.DeviceClass device_class_enabled = 10;
+
+    }
+
+    message UplinkRelayRxInfo {
+        string dev_eui = 1;
+        uint32 frequency = 2;
+        uint32 dr = 3;
+        int32 snr = 4;
+        int32 rssi = 5;
+        uint32 wor_channel = 6;
+
+    }
+
+    message UplinkEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        string dev_addr = 4;
+        bool adr = 5;
+        uint32 dr = 6;
+        uint32 f_cnt = 7;
+        uint32 f_port = 8;
+        bool confirmed = 9;
+        bytes data = 10;
+        Struct object = 11;
+        repeated gw.UplinkRxInfo rx_info = 12;
+        gw.UplinkTxInfo tx_info = 13;
+        UplinkRelayRxInfo relay_rx_info = 14;
+        common.JoinServerContext join_server_context = 15;
+
+    }
+
+    message JoinEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        string dev_addr = 4;
+        UplinkRelayRxInfo relay_rx_info = 5;
+        common.JoinServerContext join_server_context = 6;
+
+    }
+
+    message AckEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        string queue_item_id = 4;
+        bool acknowledged = 5;
+        uint32 f_cnt_down = 6;
+
+    }
+
+    message TxAckEvent {
+        uint32 downlink_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        string queue_item_id = 4;
+        uint32 f_cnt_down = 5;
+        string gateway_id = 6;
+        gw.DownlinkTxInfo tx_info = 7;
+
+    }
+
+    message LogEvent {
+        Timestamp time = 1;
+        DeviceInfo device_info = 2;
+        LogLevel level = 3;
+        LogCode code = 4;
+        string description = 5;
+        map<string,string> context = 6;
+
+    }
+
+    message StatusEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        int32 margin = 5;
+        bool external_power_source = 6;
+        bool battery_level_unavailable = 7;
+        float battery_level = 8;
+
+    }
+
+    message LocationEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        common.Location location = 4;
+
+    }
+
+    message IntegrationEvent {
+        string deduplication_id = 1;
+        Timestamp time = 2;
+        DeviceInfo device_info = 3;
+        string integration_name = 4;
+        string event_type = 5;
+        Struct object = 6;
+
+    }
+
+    message DownlinkCommand {
+        string id = 1;
+        string dev_eui = 2;
+        bool confirmed = 3;
+        uint32 f_port = 4;
+        bytes data = 5;
+        Struct object = 6;
+
+    }
+
+
+}
+
+message internal {
+    message DeviceSession {
+        bytes dev_addr = 2;
+        common.MacVersion mac_version = 4;
+        bytes f_nwk_s_int_key = 5;
+        bytes s_nwk_s_int_key = 6;
+        bytes nwk_s_enc_key = 7;
+        common.KeyEnvelope app_s_key = 8;
+        uint32 f_cnt_up = 9;
+        uint32 n_f_cnt_down = 10;
+        uint32 a_f_cnt_down = 11;
+        uint32 conf_f_cnt = 12;
+        bool skip_f_cnt_check = 13;
+        uint32 rx1_delay = 14;
+        uint32 rx1_dr_offset = 15;
+        uint32 rx2_dr = 16;
+        uint32 rx2_frequency = 17;
+        repeated uint32 enabled_uplink_channel_indices = 18;
+        map<uint32,DeviceSessionChannel> extra_uplink_channels = 19;
+        uint32 class_b_ping_slot_dr = 20;
+        uint32 class_b_ping_slot_freq = 21;
+        uint32 class_b_ping_slot_nb = 22;
+        uint32 nb_trans = 23;
+        uint32 tx_power_index = 24;
+        uint32 dr = 25;
+        bool adr = 26;
+        uint32 max_supported_tx_power_index = 27;
+        uint32 min_supported_tx_power_index = 28;
+        DeviceSession pending_rejoin_device_session = 29;
+        repeated UplinkAdrHistory uplink_adr_history = 30;
+        map<uint32,uint32> mac_command_error_count = 31;
+        Timestamp last_device_status_request = 32;
+        bool rejoin_request_enabled = 33;
+        uint32 rejoin_request_max_count_n = 34;
+        uint32 rejoin_request_max_time_n = 35;
+        uint32 rejoin_count_0 = 36;
+        bool uplink_dwell_time_400ms = 37;
+        bool downlink_dwell_time_400ms = 38;
+        uint32 uplink_max_eirp_index = 39;
+        string region_config_id = 40;
+        Relay relay = 41;
+        bytes js_session_key_id = 42;
+
+    }
+
+    message UplinkAdrHistory {
+        uint32 f_cnt = 1;
+        float max_snr = 2;
+        uint32 tx_power_index = 3;
+        uint32 gateway_count = 4;
+        int32 max_rssi = 5;
+
+    }
+
+    message Relay {
+        repeated RelayDevice devices = 1;
+        repeated RelayFilter filters = 2;
+        bool enabled = 3;
+        uint32 cad_periodicity = 4;
+        uint32 default_channel_index = 5;
+        uint32 second_channel_freq = 6;
+        uint32 second_channel_dr = 7;
+        uint32 second_channel_ack_offset = 8;
+        uint32 ed_activation_mode = 9;
+        uint32 ed_smart_enable_level = 10;
+        uint32 ed_back_off = 11;
+        uint32 join_req_limit_reload_rate = 12;
+        uint32 notify_limit_reload_rate = 13;
+        uint32 global_uplink_limit_reload_rate = 14;
+        uint32 overall_limit_reload_rate = 15;
+        uint32 join_req_limit_bucket_size = 16;
+        uint32 notify_limit_bucket_size = 17;
+        uint32 global_uplink_limit_bucket_size = 18;
+        uint32 overall_limit_bucket_size = 19;
+        bool ed_relay_only = 20;
+        uint32 w_f_cnt = 21;
+
+    }
+
+    message RelayDevice {
+        uint32 index = 1;
+        bytes join_eui = 2;
+        bytes dev_eui = 3;
+        bytes dev_addr = 4;
+        bytes root_wor_s_key = 5;
+        bool provisioned = 6;
+        uint32 uplink_limit_bucket_size = 7;
+        uint32 uplink_limit_reload_rate = 8;
+        Timestamp w_f_cnt_last_request = 9;
+
+    }
+
+    message RelayFilter {
+        uint32 index = 1;
+        uint32 action = 2;
+        bytes dev_eui = 3;
+        bytes join_eui = 4;
+        bool provisioned = 5;
+
+    }
+
+    message DeviceSessionChannel {
+        uint32 frequency = 1;
+        uint32 min_dr = 2;
+        uint32 max_dr = 3;
+
+    }
+
+    message DeviceGatewayRxInfo {
+        bytes dev_eui = 1;
+        uint32 dr = 2;
+        repeated DeviceGatewayRxInfoItem items = 3;
+
+    }
+
+    message DeviceGatewayRxInfoItem {
+        bytes gateway_id = 1;
+        int32 rssi = 2;
+        float lora_snr = 3;
+        uint32 antenna = 4;
+        uint32 board = 5;
+        bytes context = 6;
+        bool is_private_up = 7;
+        bool is_private_down = 8;
+        bytes tenant_id = 9;
+
+    }
+
+    message DownlinkFrame {
+        uint32 downlink_id = 1;
+        bytes dev_eui = 2;
+        bytes device_queue_item_id = 3;
+        bytes multicast_group_id = 4;
+        bytes multicast_group_queue_item_id = 5;
+        gw.DownlinkFrame downlink_frame = 6;
+        bool encrypted_fopts = 8;
+        bytes nwk_s_enc_key = 9;
+        uint32 n_f_cnt_down = 10;
+        uint32 a_f_cnt_down = 11;
+        bytes dev_eui_relayed = 12;
+
+    }
+
+    message LoraCloudGeolocBuffer {
+        repeated LoraCloudGeolocBufferUplink uplinks = 1;
+
+    }
+
+    message LoraCloudGeolocBufferUplink {
+        repeated gw.UplinkRxInfo rx_info = 1;
+
+    }
+
+    message PassiveRoamingDeviceSession {
+        bytes session_id = 1;
+        bytes net_id = 2;
+        bytes dev_addr = 3;
+        bytes dev_eui = 4;
+        bool lorawan_1_1 = 5;
+        bytes f_nwk_s_int_key = 6;
+        Timestamp lifetime = 7;
+        uint32 f_cnt_up = 8;
+        bool validate_mic = 9;
+
+    }
+
+
+}
+
+message stream {
+    message ApiRequestLog {
+        string service = 1;
+        string method = 2;
+        map<string,string> metadata = 3;
+
+    }
+
+
+    message BackendInterfacesRequest {
+        string sender_id = 1;
+        string receiver_id = 2;
+        Timestamp time = 3;
+        uint32 transaction_id = 4;
+        string message_type = 5;
+        string result_code = 6;
+        string request_body = 7;
+        string request_error = 8;
+        string response_body = 9;
+
+    }
+
+
+    message UplinkFrameLog {
+        bytes phy_payload = 1;
+        gw.UplinkTxInfo tx_info = 2;
+        repeated gw.UplinkRxInfo rx_info = 3;
+        common.MType m_type = 4;
+        string dev_addr = 5;
+        string dev_eui = 6;
+        Timestamp time = 7;
+        bool plaintext_f_opts = 8;
+        bool plaintext_frm_payload = 9;
+
+    }
+
+    message DownlinkFrameLog {
+        Timestamp time = 1;
+        bytes phy_payload = 2;
+        gw.DownlinkTxInfo tx_info = 3;
+        uint32 downlink_id = 4;
+        string gateway_id = 5;
+        common.MType m_type = 6;
+        string dev_addr = 7;
+        string dev_eui = 8;
+        bool plaintext_f_opts = 9;
+        bool plaintext_frm_payload = 10;
+
+    }
+
+
+    message UplinkMeta {
+        string dev_eui = 1;
+        gw.UplinkTxInfo tx_info = 2;
+        repeated gw.UplinkRxInfo rx_info = 3;
+        uint32 phy_payload_byte_count = 4;
+        uint32 mac_command_byte_count = 5;
+        uint32 application_payload_byte_count = 6;
+        common.MType message_type = 7;
+
+    }
+
+    message DownlinkMeta {
+        string dev_eui = 1;
+        string multicast_group_id = 2;
+        gw.DownlinkTxInfo tx_info = 3;
+        uint32 phy_payload_byte_count = 4;
+        uint32 mac_command_byte_count = 5;
+        uint32 application_payload_byte_count = 6;
+        common.MType message_type = 7;
+        string gateway_id = 8;
+
+    }
+
+
+}
+
+service ApplicationService {
+    rpc Create(CreateApplicationRequest) returns (CreateApplicationResponse) {
+        option (google.api.http) = {post : "/api/applications" body : "*"};
+    }
+
+    rpc Get(GetApplicationRequest) returns (GetApplicationResponse) {
+        option (google.api.http) = {get : "/api/applications/{id}"};
+    }
+
+    rpc Update(UpdateApplicationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{application.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteApplicationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{id}"};
+    }
+
+    rpc List(ListApplicationsRequest) returns (ListApplicationsResponse) {
+        option (google.api.http) = {get : "/api/applications"};
+    }
+
+    rpc ListIntegrations(ListIntegrationsRequest) returns (ListIntegrationsResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations"};
+    }
+
+    rpc CreateHttpIntegration(CreateHttpIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/http" body : "*"};
+    }
+
+    rpc GetHttpIntegration(GetHttpIntegrationRequest) returns (GetHttpIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/http"};
+    }
+
+    rpc UpdateHttpIntegration(UpdateHttpIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/http" body : "*"};
+    }
+
+    rpc DeleteHttpIntegration(DeleteHttpIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/http"};
+    }
+
+    rpc CreateInfluxDbIntegration(CreateInfluxDbIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "influxdb" body : "*"};
+    }
+
+    rpc GetInfluxDbIntegration(GetInfluxDbIntegrationRequest) returns (GetInfluxDbIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/influxdb"};
+    }
+
+    rpc UpdateInfluxDbIntegration(UpdateInfluxDbIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "influxdb" body : "*"};
+    }
+
+    rpc DeleteInfluxDbIntegration(DeleteInfluxDbIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/influxdb"};
+    }
+
+    rpc CreateThingsBoardIntegration(CreateThingsBoardIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "thingsboard" body : "*"};
+    }
+
+    rpc GetThingsBoardIntegration(GetThingsBoardIntegrationRequest) returns (GetThingsBoardIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/thingsboard"};
+    }
+
+    rpc UpdateThingsBoardIntegration(UpdateThingsBoardIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "thingsboard" body : "*"};
+    }
+
+    rpc DeleteThingsBoardIntegration(DeleteThingsBoardIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/thingsboard"};
+    }
+
+    rpc CreateMyDevicesIntegration(CreateMyDevicesIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "mydevices" body : "*"};
+    }
+
+    rpc GetMyDevicesIntegration(GetMyDevicesIntegrationRequest) returns (GetMyDevicesIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/mydevices"};
+    }
+
+    rpc UpdateMyDevicesIntegration(UpdateMyDevicesIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "mydevices" body : "*"};
+    }
+
+    rpc DeleteMyDevicesIntegration(DeleteMyDevicesIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/mydevices"};
+    }
+
+    rpc CreateLoraCloudIntegration(CreateLoraCloudIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "loracloud" body : "*"};
+    }
+
+    rpc GetLoraCloudIntegration(GetLoraCloudIntegrationRequest) returns (GetLoraCloudIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/loracloud"};
+    }
+
+    rpc UpdateLoraCloudIntegration(UpdateLoraCloudIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "loracloud" body : "*"};
+    }
+
+    rpc DeleteLoraCloudIntegration(DeleteLoraCloudIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/loracloud"};
+    }
+
+    rpc CreateGcpPubSubIntegration(CreateGcpPubSubIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "gcp-pub-sub" body : "*"};
+    }
+
+    rpc GetGcpPubSubIntegration(GetGcpPubSubIntegrationRequest) returns (GetGcpPubSubIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/gcp-pub-sub"};
+    }
+
+    rpc UpdateGcpPubSubIntegration(UpdateGcpPubSubIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "gcp-pub-sub" body : "*"};
+    }
+
+    rpc DeleteGcpPubSubIntegration(DeleteGcpPubSubIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/gcp-pub-sub"};
+    }
+
+    rpc CreateAwsSnsIntegration(CreateAwsSnsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "aws-sns" body : "*"};
+    }
+
+    rpc GetAwsSnsIntegration(GetAwsSnsIntegrationRequest) returns (GetAwsSnsIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/aws-sns"};
+    }
+
+    rpc UpdateAwsSnsIntegration(UpdateAwsSnsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "aws-sns" body : "*"};
+    }
+
+    rpc DeleteAwsSnsIntegration(DeleteAwsSnsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/aws-sns"};
+    }
+
+    rpc CreateAzureServiceBusIntegration(CreateAzureServiceBusIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "azure-service-bus" body : "*"};
+    }
+
+    rpc GetAzureServiceBusIntegration(GetAzureServiceBusIntegrationRequest) returns (GetAzureServiceBusIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/azure-service-bus"};
+    }
+
+    rpc UpdateAzureServiceBusIntegration(UpdateAzureServiceBusIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "azure-service-bus" body : "*"};
+    }
+
+    rpc DeleteAzureServiceBusIntegration(DeleteAzureServiceBusIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/" "azure-service-bus"};
+    }
+
+    rpc CreatePilotThingsIntegration(CreatePilotThingsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/" "pilot-things" body : "*"};
+    }
+
+    rpc GetPilotThingsIntegration(GetPilotThingsIntegrationRequest) returns (GetPilotThingsIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/pilot-things"};
+    }
+
+    rpc UpdatePilotThingsIntegration(UpdatePilotThingsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/" "pilot-things" body : "*"};
+    }
+
+    rpc DeletePilotThingsIntegration(DeletePilotThingsIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/pilot-things"};
+    }
+
+    rpc CreateIftttIntegration(CreateIftttIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/applications/{integration.application_id}/integrations/ifttt" body : "*"};
+    }
+
+    rpc GetIftttIntegration(GetIftttIntegrationRequest) returns (GetIftttIntegrationResponse) {
+        option (google.api.http) = {get : "/api/applications/{application_id}/integrations/ifttt"};
+    }
+
+    rpc UpdateIftttIntegration(UpdateIftttIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/applications/{integration.application_id}/integrations/ifttt" body : "*"};
+    }
+
+    rpc DeleteIftttIntegration(DeleteIftttIntegrationRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/applications/{application_id}/integrations/ifttt"};
+    }
+
+    rpc GenerateMqttIntegrationClientCertificate(GenerateMqttIntegrationClientCertificateRequest) returns (GenerateMqttIntegrationClientCertificateResponse) {
+        option (google.api.http) = {post : "/api/applications/{application_id}/integrations/mqtt/certificate"};
+    }
+
+}
+
+service DeviceService {
+    rpc Create(CreateDeviceRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/devices" body : "*"};
+    }
+
+    rpc Get(GetDeviceRequest) returns (GetDeviceResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}"};
+    }
+
+    rpc Update(UpdateDeviceRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/devices/{device.dev_eui}" body : "*"};
+    }
+
+    rpc Delete(DeleteDeviceRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/devices/{dev_eui}"};
+    }
+
+    rpc List(ListDevicesRequest) returns (ListDevicesResponse) {
+        option (google.api.http) = {get : "/api/devices"};
+    }
+
+    rpc CreateKeys(CreateDeviceKeysRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/devices/{device_keys.dev_eui}/keys" body : "*"};
+    }
+
+    rpc GetKeys(GetDeviceKeysRequest) returns (GetDeviceKeysResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}/keys"};
+    }
+
+    rpc UpdateKeys(UpdateDeviceKeysRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/devices/{device_keys.dev_eui}/keys" body : "*"};
+    }
+
+    rpc DeleteKeys(DeleteDeviceKeysRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/devices/{dev_eui}/keys"};
+    }
+
+    rpc FlushDevNonces(FlushDevNoncesRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/devices/{dev_eui}/dev-nonces"};
+    }
+
+    rpc Activate(ActivateDeviceRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/devices/{device_activation.dev_eui}/activate" body : "*"};
+    }
+
+    rpc Deactivate(DeactivateDeviceRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/devices/{dev_eui}/activation"};
+    }
+
+    rpc GetActivation(GetDeviceActivationRequest) returns (GetDeviceActivationResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}/activation"};
+    }
+
+    rpc GetRandomDevAddr(GetRandomDevAddrRequest) returns (GetRandomDevAddrResponse) {
+        option (google.api.http) = {post : "/api/devices/{dev_eui}/get-random-dev-addr"};
+    }
+
+    rpc GetMetrics(GetDeviceMetricsRequest) returns (GetDeviceMetricsResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}/metrics"};
+    }
+
+    rpc GetLinkMetrics(GetDeviceLinkMetricsRequest) returns (GetDeviceLinkMetricsResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}/link-metrics"};
+    }
+
+    rpc Enqueue(EnqueueDeviceQueueItemRequest) returns (EnqueueDeviceQueueItemResponse) {
+        option (google.api.http) = {post : "/api/devices/{queue_item.dev_eui}/queue" body : "*"};
+    }
+
+    rpc FlushQueue(FlushDeviceQueueRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/devices/{dev_eui}/queue"};
+    }
+
+    rpc GetQueue(GetDeviceQueueItemsRequest) returns (GetDeviceQueueItemsResponse) {
+        option (google.api.http) = {get : "/api/devices/{dev_eui}/queue"};
+    }
+
+    rpc GetNextFCntDown(GetDeviceNextFCntDownRequest) returns (GetDeviceNextFCntDownResponse) {
+        option (google.api.http) = {post : "/api/devices/{dev_eui}/get-next-f-cnt-down" body : "*"};
+    }
+
+}
+
+service DeviceProfileService {
+    rpc Create(CreateDeviceProfileRequest) returns (CreateDeviceProfileResponse) {
+        option (google.api.http) = {post : "/api/device-profiles" body : "*"};
+    }
+
+    rpc Get(GetDeviceProfileRequest) returns (GetDeviceProfileResponse) {
+        option (google.api.http) = {get : "/api/device-profiles/{id}"};
+    }
+
+    rpc Update(UpdateDeviceProfileRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/device-profiles/{device_profile.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteDeviceProfileRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/device-profiles/{id}"};
+    }
+
+    rpc List(ListDeviceProfilesRequest) returns (ListDeviceProfilesResponse) {
+        option (google.api.http) = {get : "/api/device-profiles"};
+    }
+
+    rpc ListAdrAlgorithms(Empty) returns (ListDeviceProfileAdrAlgorithmsResponse) {
+        option (google.api.http) = {get : "/api/device-profiles/adr-algorithms"};
+    }
+
+}
+
+service DeviceProfileTemplateService {
+    rpc Create(CreateDeviceProfileTemplateRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/device-profile-templates" body : "*"};
+    }
+
+    rpc Get(GetDeviceProfileTemplateRequest) returns (GetDeviceProfileTemplateResponse) {
+        option (google.api.http) = {get : "/api/device-profile-templates/{id}"};
+    }
+
+    rpc Update(UpdateDeviceProfileTemplateRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/device-profile-templates/{device_profile_template.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteDeviceProfileTemplateRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/device-profile-templates/{id}"};
+    }
+
+    rpc List(ListDeviceProfileTemplatesRequest) returns (ListDeviceProfileTemplatesResponse) {
+        option (google.api.http) = {get : "/api/device-profile-templates"};
+    }
+
+}
+
+service GatewayService {
+    rpc Create(CreateGatewayRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/gateways" body : "*"};
+    }
+
+    rpc Get(GetGatewayRequest) returns (GetGatewayResponse) {
+        option (google.api.http) = {get : "/api/gateways/{gateway_id}"};
+    }
+
+    rpc Update(UpdateGatewayRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/gateways/{gateway.gateway_id}" body : "*"};
+    }
+
+    rpc Delete(DeleteGatewayRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/gateways/{gateway_id}"};
+    }
+
+    rpc List(ListGatewaysRequest) returns (ListGatewaysResponse) {
+        option (google.api.http) = {get : "/api/gateways"};
+    }
+
+    rpc GenerateClientCertificate(GenerateGatewayClientCertificateRequest) returns (GenerateGatewayClientCertificateResponse) {
+        option (google.api.http) = {post : "/api/gateways/{gateway_id}/generate-certificate"};
+    }
+
+    rpc GetMetrics(GetGatewayMetricsRequest) returns (GetGatewayMetricsResponse) {
+        option (google.api.http) = {get : "/api/gateways/{gateway_id}/metrics"};
+    }
+
+    rpc GetDutyCycleMetrics(GetGatewayDutyCycleMetricsRequest) returns (GetGatewayDutyCycleMetricsResponse) {
+        option (google.api.http) = {get : "/api/gateways/{gateway_id}/duty-cycle-metrics"};
+    }
+
+}
+
+service InternalService {
+    rpc Login(LoginRequest) returns (LoginResponse) {
+    }
+
+    rpc Profile(Empty) returns (ProfileResponse) {
+    }
+
+    rpc GlobalSearch(GlobalSearchRequest) returns (GlobalSearchResponse) {
+    }
+
+    rpc CreateApiKey(CreateApiKeyRequest) returns (CreateApiKeyResponse) {
+    }
+
+    rpc DeleteApiKey(DeleteApiKeyRequest) returns (Empty) {
+    }
+
+    rpc ListApiKeys(ListApiKeysRequest) returns (ListApiKeysResponse) {
+    }
+
+    rpc Settings(Empty) returns (SettingsResponse) {
+    }
+
+    rpc OpenIdConnectLogin(OpenIdConnectLoginRequest) returns (OpenIdConnectLoginResponse) {
+    }
+
+    rpc OAuth2Login(OAuth2LoginRequest) returns (OAuth2LoginResponse) {
+    }
+
+    rpc GetDevicesSummary(GetDevicesSummaryRequest) returns (GetDevicesSummaryResponse) {
+    }
+
+    rpc GetGatewaysSummary(GetGatewaysSummaryRequest) returns (GetGatewaysSummaryResponse) {
+    }
+
+    rpc StreamGatewayFrames(StreamGatewayFramesRequest) returns (LogItem) {
+    }
+
+    rpc StreamDeviceFrames(StreamDeviceFramesRequest) returns (LogItem) {
+    }
+
+    rpc StreamDeviceEvents(StreamDeviceEventsRequest) returns (LogItem) {
+    }
+
+    rpc ListRegions(Empty) returns (ListRegionsResponse) {
+    }
+
+    rpc GetRegion(GetRegionRequest) returns (GetRegionResponse) {
+    }
+
+    rpc GetVersion(Empty) returns (GetVersionResponse) {
+    }
+
+}
+
+service MulticastGroupService {
+    rpc Create(CreateMulticastGroupRequest) returns (CreateMulticastGroupResponse) {
+        option (google.api.http) = {post : "/api/multicast-groups" body : "*"};
+    }
+
+    rpc Get(GetMulticastGroupRequest) returns (GetMulticastGroupResponse) {
+        option (google.api.http) = {get : "/api/multicast-groups/{id}"};
+    }
+
+    rpc Update(UpdateMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/multicast-groups/{multicast_group.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/multicast-groups/{id}"};
+    }
+
+    rpc List(ListMulticastGroupsRequest) returns (ListMulticastGroupsResponse) {
+        option (google.api.http) = {get : "/api/multicast-groups"};
+    }
+
+    rpc AddDevice(AddDeviceToMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/multicast-groups/{multicast_group_id}/devices" body : "*"};
+    }
+
+    rpc RemoveDevice(RemoveDeviceFromMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/multicast-groups/{multicast_group_id}/devices/{dev_eui}"};
+    }
+
+    rpc AddGateway(AddGatewayToMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/multicast-groups/{multicast_group_id}/gateways" body : "*"};
+    }
+
+    rpc RemoveGateway(RemoveGatewayFromMulticastGroupRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/multicast-groups/{multicast_group_id}/gateways/{gateway_id}"};
+    }
+
+    rpc Enqueue(EnqueueMulticastGroupQueueItemRequest) returns (EnqueueMulticastGroupQueueItemResponse) {
+        option (google.api.http) = {post : "/api/multicast-groups/{queue_item.multicast_group_id}/queue" body : "*"};
+    }
+
+    rpc FlushQueue(FlushMulticastGroupQueueRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/multicast-groups/{multicast_group_id}/queue"};
+    }
+
+    rpc ListQueue(ListMulticastGroupQueueRequest) returns (ListMulticastGroupQueueResponse) {
+        option (google.api.http) = {get : "/api/multicast-groups/{multicast_group_id}/queue"};
+    }
+
+}
+
+service RelayService {
+    rpc List(ListRelaysRequest) returns (ListRelaysResponse) {
+        option (google.api.http) = {get : "/api/relays"};
+    }
+
+    rpc AddDevice(AddRelayDeviceRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/relays/{relay_dev_eui}/devices" body : "*"};
+    }
+
+    rpc RemoveDevice(RemoveRelayDeviceRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/relays/{relay_dev_eui}/devices/{dev_eui}"};
+    }
+
+    rpc ListDevices(ListRelayDevicesRequest) returns (ListRelayDevicesResponse) {
+        option (google.api.http) = {get : "/api/relays/{relay_dev_eui}/devices"};
+    }
+
+}
+
+service TenantService {
+    rpc Create(CreateTenantRequest) returns (CreateTenantResponse) {
+        option (google.api.http) = {post : "/api/tenants" body : "*"};
+    }
+
+    rpc Get(GetTenantRequest) returns (GetTenantResponse) {
+        option (google.api.http) = {get : "/api/tenants/{id}"};
+    }
+
+    rpc Update(UpdateTenantRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/tenants/{tenant.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteTenantRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/tenants/{id}"};
+    }
+
+    rpc List(ListTenantsRequest) returns (ListTenantsResponse) {
+        option (google.api.http) = {get : "/api/tenants"};
+    }
+
+    rpc AddUser(AddTenantUserRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/tenants/{tenant_user.tenant_id}/users" body : "*"};
+    }
+
+    rpc GetUser(GetTenantUserRequest) returns (GetTenantUserResponse) {
+        option (google.api.http) = {get : "/api/tenants/{tenant_id}/users/{user_id}"};
+    }
+
+    rpc UpdateUser(UpdateTenantUserRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/tenants/{tenant_user.tenant_id}/users/{tenant_user.user_id}" body : "*"};
+    }
+
+    rpc DeleteUser(DeleteTenantUserRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/tenants/{tenant_id}/users/{user_id}"};
+    }
+
+    rpc ListUsers(ListTenantUsersRequest) returns (ListTenantUsersResponse) {
+        option (google.api.http) = {get : "/api/tenants/{tenant_id}/users"};
+    }
+
+}
+
+service UserService {
+    rpc Create(CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {post : "/api/users" body : "*"};
+    }
+
+    rpc Get(GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {get : "/api/users/{id}"};
+    }
+
+    rpc Update(UpdateUserRequest) returns (Empty) {
+        option (google.api.http) = {put : "/api/users/{user.id}" body : "*"};
+    }
+
+    rpc Delete(DeleteUserRequest) returns (Empty) {
+        option (google.api.http) = {delete : "/api/users/{id}"};
+    }
+
+    rpc List(ListUsersRequest) returns (ListUsersResponse) {
+        option (google.api.http) = {get : "/api/users"};
+    }
+
+    rpc UpdatePassword(UpdateUserPasswordRequest) returns (Empty) {
+        option (google.api.http) = {post : "/api/users/{user_id}/password" body : "*"};
+    }
+
+}
+
+message api {
+    enum Encoding {
+        JSON  = 0;
+        PROTOBUF  = 1;
+    }
+
+    enum IntegrationKind {
+        HTTP  = 0;
+        INFLUX_DB  = 1;
+        THINGS_BOARD  = 2;
+        MY_DEVICES  = 3;
+        LORA_CLOUD  = 4;
+        GCP_PUB_SUB  = 5;
+        AWS_SNS  = 6;
+        AZURE_SERVICE_BUS  = 7;
+        PILOT_THINGS  = 8;
+        MQTT_GLOBAL  = 9;
+        IFTTT  = 10;
+    }
+
+    enum InfluxDbPrecision {
+        NS  = 0;
+        U  = 1;
+        MS  = 2;
+        S  = 3;
+        M  = 4;
+        H  = 5;
+    }
+
+    enum InfluxDbVersion {
+        INFLUXDB_1  = 0;
+        INFLUXDB_2  = 1;
+    }
+
+    message Application {
+        string id = 1;
+        string name = 2;
+        string description = 3;
+        string tenant_id = 4;
+        map<string,string> tags = 5;
+
+    }
+
+    message ApplicationListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string name = 4;
+        string description = 5;
+
+    }
+
+    message CreateApplicationRequest {
+        Application application = 1;
+
+    }
+
+    message CreateApplicationResponse {
+        string id = 1;
+
+    }
+
+    message GetApplicationRequest {
+        string id = 1;
+
+    }
+
+    message GetApplicationResponse {
+        Application application = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        repeated string measurement_keys = 4;
+
+    }
+
+    message UpdateApplicationRequest {
+        Application application = 1;
+
+    }
+
+    message DeleteApplicationRequest {
+        string id = 1;
+
+    }
+
+    message ListApplicationsRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string tenant_id = 4;
+
+    }
+
+    message ListApplicationsResponse {
+        uint32 total_count = 1;
+        repeated ApplicationListItem result = 2;
+
+    }
+
+    message ListIntegrationsRequest {
+        string application_id = 1;
+
+    }
+
+    message IntegrationListItem {
+        IntegrationKind kind = 1;
+
+    }
+
+    message ListIntegrationsResponse {
+        uint32 total_count = 1;
+        repeated IntegrationListItem result = 2;
+
+    }
+
+    message HttpIntegration {
+        string application_id = 1;
+        map<string,string> headers = 2;
+        Encoding encoding = 3;
+        string event_endpoint_url = 4;
+
+    }
+
+    message CreateHttpIntegrationRequest {
+        HttpIntegration integration = 1;
+
+    }
+
+    message GetHttpIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetHttpIntegrationResponse {
+        HttpIntegration integration = 1;
+
+    }
+
+    message UpdateHttpIntegrationRequest {
+        HttpIntegration integration = 1;
+
+    }
+
+    message DeleteHttpIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message InfluxDbIntegration {
+        string application_id = 1;
+        string endpoint = 2;
+        string db = 3;
+        string username = 4;
+        string password = 5;
+        string retention_policy_name = 6;
+        InfluxDbPrecision precision = 7;
+        InfluxDbVersion version = 8;
+        string token = 9;
+        string organization = 10;
+        string bucket = 11;
+
+    }
+
+    message CreateInfluxDbIntegrationRequest {
+        InfluxDbIntegration integration = 1;
+
+    }
+
+    message GetInfluxDbIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetInfluxDbIntegrationResponse {
+        InfluxDbIntegration integration = 1;
+
+    }
+
+    message UpdateInfluxDbIntegrationRequest {
+        InfluxDbIntegration integration = 1;
+
+    }
+
+    message DeleteInfluxDbIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message ThingsBoardIntegration {
+        string application_id = 1;
+        string server = 2;
+
+    }
+
+    message CreateThingsBoardIntegrationRequest {
+        ThingsBoardIntegration integration = 1;
+
+    }
+
+    message GetThingsBoardIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetThingsBoardIntegrationResponse {
+        ThingsBoardIntegration integration = 1;
+
+    }
+
+    message UpdateThingsBoardIntegrationRequest {
+        ThingsBoardIntegration integration = 1;
+
+    }
+
+    message DeleteThingsBoardIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message MyDevicesIntegration {
+        string application_id = 1;
+        string endpoint = 2;
+
+    }
+
+    message CreateMyDevicesIntegrationRequest {
+        MyDevicesIntegration integration = 1;
+
+    }
+
+    message GetMyDevicesIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetMyDevicesIntegrationResponse {
+        MyDevicesIntegration integration = 1;
+
+    }
+
+    message UpdateMyDevicesIntegrationRequest {
+        MyDevicesIntegration integration = 1;
+
+    }
+
+    message DeleteMyDevicesIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message LoraCloudIntegration {
+        string application_id = 1;
+        LoraCloudModemGeolocationServices modem_geolocation_services = 2;
+
+    }
+
+    message LoraCloudModemGeolocationServices {
+        string token = 1;
+        bool modem_enabled = 2;
+        bool gnss_use_rx_time = 5;
+        bool parse_tlv = 6;
+        uint32 geolocation_buffer_ttl = 7;
+        uint32 geolocation_min_buffer_size = 8;
+        bool geolocation_tdoa = 9;
+        bool geolocation_rssi = 10;
+        bool geolocation_gnss = 11;
+        string geolocation_gnss_payload_field = 12;
+        bool geolocation_gnss_use_rx_time = 13;
+        bool geolocation_wifi = 14;
+        string geolocation_wifi_payload_field = 15;
+        repeated uint32 forward_f_ports = 16;
+        bool gnss_use_gateway_location = 17;
+
+    }
+
+    message CreateLoraCloudIntegrationRequest {
+        LoraCloudIntegration integration = 1;
+
+    }
+
+    message GetLoraCloudIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetLoraCloudIntegrationResponse {
+        LoraCloudIntegration integration = 1;
+
+    }
+
+    message UpdateLoraCloudIntegrationRequest {
+        LoraCloudIntegration integration = 1;
+
+    }
+
+    message DeleteLoraCloudIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GcpPubSubIntegration {
+        string application_id = 1;
+        Encoding encoding = 2;
+        string credentials_file = 3;
+        string project_id = 4;
+        string topic_name = 5;
+
+    }
+
+    message CreateGcpPubSubIntegrationRequest {
+        GcpPubSubIntegration integration = 1;
+
+    }
+
+    message GetGcpPubSubIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetGcpPubSubIntegrationResponse {
+        GcpPubSubIntegration integration = 1;
+
+    }
+
+    message UpdateGcpPubSubIntegrationRequest {
+        GcpPubSubIntegration integration = 1;
+
+    }
+
+    message DeleteGcpPubSubIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message AwsSnsIntegration {
+        string application_id = 1;
+        Encoding encoding = 2;
+        string region = 3;
+        string access_key_id = 4;
+        string secret_access_key = 5;
+        string topic_arn = 6;
+
+    }
+
+    message CreateAwsSnsIntegrationRequest {
+        AwsSnsIntegration integration = 1;
+
+    }
+
+    message GetAwsSnsIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetAwsSnsIntegrationResponse {
+        AwsSnsIntegration integration = 1;
+
+    }
+
+    message UpdateAwsSnsIntegrationRequest {
+        AwsSnsIntegration integration = 1;
+
+    }
+
+    message DeleteAwsSnsIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message AzureServiceBusIntegration {
+        string application_id = 1;
+        Encoding encoding = 2;
+        string connection_string = 3;
+        string publish_name = 4;
+
+    }
+
+    message CreateAzureServiceBusIntegrationRequest {
+        AzureServiceBusIntegration integration = 1;
+
+    }
+
+    message GetAzureServiceBusIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetAzureServiceBusIntegrationResponse {
+        AzureServiceBusIntegration integration = 1;
+
+    }
+
+    message UpdateAzureServiceBusIntegrationRequest {
+        AzureServiceBusIntegration integration = 1;
+
+    }
+
+    message DeleteAzureServiceBusIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message PilotThingsIntegration {
+        string application_id = 1;
+        string server = 2;
+        string token = 3;
+
+    }
+
+    message CreatePilotThingsIntegrationRequest {
+        PilotThingsIntegration integration = 1;
+
+    }
+
+    message GetPilotThingsIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetPilotThingsIntegrationResponse {
+        PilotThingsIntegration integration = 1;
+
+    }
+
+    message UpdatePilotThingsIntegrationRequest {
+        PilotThingsIntegration integration = 1;
+
+    }
+
+    message DeletePilotThingsIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message IftttIntegration {
+        string application_id = 1;
+        string key = 2;
+        repeated string uplink_values = 3;
+        bool arbitrary_json = 4;
+        string event_prefix = 5;
+
+    }
+
+    message CreateIftttIntegrationRequest {
+        IftttIntegration integration = 1;
+
+    }
+
+    message GetIftttIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GetIftttIntegrationResponse {
+        IftttIntegration integration = 1;
+
+    }
+
+    message UpdateIftttIntegrationRequest {
+        IftttIntegration integration = 1;
+
+    }
+
+    message DeleteIftttIntegrationRequest {
+        string application_id = 1;
+
+    }
+
+    message GenerateMqttIntegrationClientCertificateRequest {
+        string application_id = 1;
+
+    }
+
+    message GenerateMqttIntegrationClientCertificateResponse {
+        string tls_cert = 1;
+        string tls_key = 2;
+        string ca_cert = 3;
+        Timestamp expires_at = 4;
+
+    }
+
+
+    message Device {
+        string dev_eui = 1;
+        string name = 2;
+        string description = 3;
+        string application_id = 4;
+        string device_profile_id = 5;
+        bool skip_fcnt_check = 6;
+        bool is_disabled = 7;
+        map<string,string> variables = 8;
+        map<string,string> tags = 9;
+        string join_eui = 10;
+
+    }
+
+    message DeviceStatus {
+        int32 margin = 1;
+        bool external_power_source = 2;
+        float battery_level = 3;
+
+    }
+
+    message DeviceListItem {
+        string dev_eui = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        Timestamp last_seen_at = 4;
+        string name = 5;
+        string description = 6;
+        string device_profile_id = 7;
+        string device_profile_name = 8;
+        DeviceStatus device_status = 9;
+
+    }
+
+    message DeviceKeys {
+        string dev_eui = 1;
+        string nwk_key = 2;
+        string app_key = 3;
+
+    }
+
+    message CreateDeviceRequest {
+        Device device = 1;
+
+    }
+
+    message GetDeviceRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceResponse {
+        Device device = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        Timestamp last_seen_at = 4;
+        DeviceStatus device_status = 5;
+        common.DeviceClass class_enabled = 6;
+
+    }
+
+    message UpdateDeviceRequest {
+        Device device = 1;
+
+    }
+
+    message DeleteDeviceRequest {
+        string dev_eui = 1;
+
+    }
+
+    message ListDevicesRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string application_id = 4;
+        string multicast_group_id = 5;
+
+    }
+
+    message ListDevicesResponse {
+        uint32 total_count = 1;
+        repeated DeviceListItem result = 2;
+
+    }
+
+    message CreateDeviceKeysRequest {
+        DeviceKeys device_keys = 1;
+
+    }
+
+    message GetDeviceKeysRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceKeysResponse {
+        DeviceKeys device_keys = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateDeviceKeysRequest {
+        DeviceKeys device_keys = 1;
+
+    }
+
+    message DeleteDeviceKeysRequest {
+        string dev_eui = 1;
+
+    }
+
+    message DeviceActivation {
+        string dev_eui = 1;
+        string dev_addr = 2;
+        string app_s_key = 3;
+        string nwk_s_enc_key = 4;
+        uint32 f_cnt_up = 5;
+        uint32 n_f_cnt_down = 6;
+        string s_nwk_s_int_key = 8;
+        string f_nwk_s_int_key = 9;
+        uint32 a_f_cnt_down = 10;
+
+    }
+
+    message ActivateDeviceRequest {
+        DeviceActivation device_activation = 1;
+
+    }
+
+    message DeactivateDeviceRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceActivationRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceActivationResponse {
+        DeviceActivation device_activation = 1;
+        common.JoinServerContext join_server_context = 2;
+
+    }
+
+    message GetRandomDevAddrRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetRandomDevAddrResponse {
+        string dev_addr = 1;
+
+    }
+
+    message GetDeviceMetricsRequest {
+        string dev_eui = 1;
+        Timestamp start = 2;
+        Timestamp end = 3;
+        common.Aggregation aggregation = 4;
+
+    }
+
+    message GetDeviceMetricsResponse {
+        map<string,common.Metric> metrics = 1;
+        map<string,DeviceState> states = 2;
+
+    }
+
+    message DeviceState {
+        string name = 2;
+        string value = 3;
+
+    }
+
+    message GetDeviceLinkMetricsRequest {
+        string dev_eui = 1;
+        Timestamp start = 2;
+        Timestamp end = 3;
+        common.Aggregation aggregation = 4;
+
+    }
+
+    message GetDeviceLinkMetricsResponse {
+        common.Metric rx_packets = 1;
+        common.Metric gw_rssi = 2;
+        common.Metric gw_snr = 3;
+        common.Metric rx_packets_per_freq = 4;
+        common.Metric rx_packets_per_dr = 5;
+        common.Metric errors = 6;
+
+    }
+
+    message DeviceQueueItem {
+        string id = 1;
+        string dev_eui = 2;
+        bool confirmed = 3;
+        uint32 f_port = 4;
+        bytes data = 5;
+        Struct object = 6;
+        bool is_pending = 7;
+        uint32 f_cnt_down = 8;
+        bool is_encrypted = 9;
+
+    }
+
+    message EnqueueDeviceQueueItemRequest {
+        DeviceQueueItem queue_item = 1;
+
+    }
+
+    message EnqueueDeviceQueueItemResponse {
+        string id = 1;
+
+    }
+
+    message FlushDeviceQueueRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceQueueItemsRequest {
+        string dev_eui = 1;
+        bool count_only = 2;
+
+    }
+
+    message GetDeviceQueueItemsResponse {
+        uint32 total_count = 1;
+        repeated DeviceQueueItem result = 2;
+
+    }
+
+    message FlushDevNoncesRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceNextFCntDownRequest {
+        string dev_eui = 1;
+
+    }
+
+    message GetDeviceNextFCntDownResponse {
+        uint32 f_cnt_down = 1;
+
+    }
+
+
+    enum CodecRuntime {
+        NONE  = 0;
+        CAYENNE_LPP  = 1;
+        JS  = 2;
+    }
+
+    enum MeasurementKind {
+        UNKNOWN  = 0;
+        COUNTER  = 1;
+        ABSOLUTE  = 2;
+        GAUGE  = 3;
+        STRING  = 4;
+    }
+
+    enum CadPeriodicity {
+        SEC_1  = 0;
+        MS_500  = 1;
+        MS_250  = 2;
+        MS_100  = 3;
+        MS_50  = 4;
+        MS_20  = 5;
+    }
+
+    enum SecondChAckOffset {
+        KHZ_0  = 0;
+        KHZ_200  = 1;
+        KHZ_400  = 2;
+        KHZ_800  = 3;
+        KHZ_1600  = 4;
+        KHZ_3200  = 5;
+    }
+
+    enum RelayModeActivation {
+        DISABLE_RELAY_MODE  = 0;
+        ENABLE_RELAY_MODE  = 1;
+        DYNAMIC  = 2;
+        END_DEVICE_CONTROLLED  = 3;
+    }
+
+    message DeviceProfile {
+        string id = 1;
+        string tenant_id = 2;
+        string name = 3;
+        common.Region region = 4;
+        common.MacVersion mac_version = 5;
+        common.RegParamsRevision reg_params_revision = 6;
+        string adr_algorithm_id = 7;
+        CodecRuntime payload_codec_runtime = 8;
+        string payload_codec_script = 9;
+        bool flush_queue_on_activate = 10;
+        uint32 uplink_interval = 11;
+        uint32 device_status_req_interval = 12;
+        bool supports_otaa = 13;
+        bool supports_class_b = 14;
+        bool supports_class_c = 15;
+        uint32 class_b_timeout = 16;
+        uint32 class_b_ping_slot_nb_k = 17;
+        uint32 class_b_ping_slot_dr = 18;
+        uint32 class_b_ping_slot_freq = 19;
+        uint32 class_c_timeout = 20;
+        uint32 abp_rx1_delay = 21;
+        uint32 abp_rx1_dr_offset = 22;
+        uint32 abp_rx2_dr = 23;
+        uint32 abp_rx2_freq = 24;
+        map<string,string> tags = 25;
+        string description = 26;
+        map<string,Measurement> measurements = 27;
+        bool auto_detect_measurements = 28;
+        string region_config_id = 29;
+        bool is_relay = 30;
+        bool is_relay_ed = 31;
+        bool relay_ed_relay_only = 32;
+        bool relay_enabled = 33;
+        CadPeriodicity relay_cad_periodicity = 34;
+        uint32 relay_default_channel_index = 35;
+        uint32 relay_second_channel_freq = 36;
+        uint32 relay_second_channel_dr = 37;
+        SecondChAckOffset relay_second_channel_ack_offset = 38;
+        RelayModeActivation relay_ed_activation_mode = 39;
+        uint32 relay_ed_smart_enable_level = 40;
+        uint32 relay_ed_back_off = 41;
+        uint32 relay_ed_uplink_limit_bucket_size = 42;
+        uint32 relay_ed_uplink_limit_reload_rate = 43;
+        uint32 relay_join_req_limit_reload_rate = 44;
+        uint32 relay_notify_limit_reload_rate = 45;
+        uint32 relay_global_uplink_limit_reload_rate = 46;
+        uint32 relay_overall_limit_reload_rate = 47;
+        uint32 relay_join_req_limit_bucket_size = 48;
+        uint32 relay_notify_limit_bucket_size = 49;
+        uint32 relay_global_uplink_limit_bucket_size = 50;
+        uint32 relay_overall_limit_bucket_size = 51;
+        bool allow_roaming = 52;
+        uint32 rx1_delay = 53;
+
+    }
+
+    message Measurement {
+        string name = 2;
+        MeasurementKind kind = 3;
+
+    }
+
+    message DeviceProfileListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string name = 4;
+        common.Region region = 5;
+        common.MacVersion mac_version = 6;
+        common.RegParamsRevision reg_params_revision = 7;
+        bool supports_otaa = 8;
+        bool supports_class_b = 9;
+        bool supports_class_c = 10;
+
+    }
+
+    message CreateDeviceProfileRequest {
+        DeviceProfile device_profile = 1;
+
+    }
+
+    message CreateDeviceProfileResponse {
+        string id = 1;
+
+    }
+
+    message GetDeviceProfileRequest {
+        string id = 1;
+
+    }
+
+    message GetDeviceProfileResponse {
+        DeviceProfile device_profile = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateDeviceProfileRequest {
+        DeviceProfile device_profile = 1;
+
+    }
+
+    message DeleteDeviceProfileRequest {
+        string id = 1;
+
+    }
+
+    message ListDeviceProfilesRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string tenant_id = 4;
+
+    }
+
+    message ListDeviceProfilesResponse {
+        uint32 total_count = 1;
+        repeated DeviceProfileListItem result = 2;
+
+    }
+
+    message ListDeviceProfileAdrAlgorithmsResponse {
+        uint32 total_count = 1;
+        repeated AdrAlgorithmListItem result = 2;
+
+    }
+
+    message AdrAlgorithmListItem {
+        string id = 1;
+        string name = 2;
+
+    }
+
+
+    message DeviceProfileTemplate {
+        string id = 1;
+        string name = 2;
+        string description = 3;
+        string vendor = 4;
+        string firmware = 5;
+        common.Region region = 6;
+        common.MacVersion mac_version = 7;
+        common.RegParamsRevision reg_params_revision = 8;
+        string adr_algorithm_id = 9;
+        CodecRuntime payload_codec_runtime = 10;
+        string payload_codec_script = 11;
+        bool flush_queue_on_activate = 12;
+        uint32 uplink_interval = 13;
+        uint32 device_status_req_interval = 14;
+        bool supports_otaa = 15;
+        bool supports_class_b = 16;
+        bool supports_class_c = 17;
+        uint32 class_b_timeout = 18;
+        uint32 class_b_ping_slot_nb_k = 19;
+        uint32 class_b_ping_slot_dr = 20;
+        uint32 class_b_ping_slot_freq = 21;
+        uint32 class_c_timeout = 22;
+        uint32 abp_rx1_delay = 23;
+        uint32 abp_rx1_dr_offset = 24;
+        uint32 abp_rx2_dr = 25;
+        uint32 abp_rx2_freq = 26;
+        map<string,string> tags = 27;
+        map<string,Measurement> measurements = 28;
+        bool auto_detect_measurements = 29;
+
+    }
+
+    message DeviceProfileTemplateListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string name = 4;
+        string vendor = 5;
+        string firmware = 6;
+        common.Region region = 7;
+        common.MacVersion mac_version = 8;
+        common.RegParamsRevision reg_params_revision = 9;
+        bool supports_otaa = 10;
+        bool supports_class_b = 11;
+        bool supports_class_c = 12;
+
+    }
+
+    message CreateDeviceProfileTemplateRequest {
+        DeviceProfileTemplate device_profile_template = 1;
+
+    }
+
+    message GetDeviceProfileTemplateRequest {
+        string id = 1;
+
+    }
+
+    message GetDeviceProfileTemplateResponse {
+        DeviceProfileTemplate device_profile_template = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateDeviceProfileTemplateRequest {
+        DeviceProfileTemplate device_profile_template = 1;
+
+    }
+
+    message DeleteDeviceProfileTemplateRequest {
+        string id = 1;
+
+    }
+
+    message ListDeviceProfileTemplatesRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+
+    }
+
+    message ListDeviceProfileTemplatesResponse {
+        uint32 total_count = 1;
+        repeated DeviceProfileTemplateListItem result = 2;
+
+    }
+
+
+    enum GatewayState {
+        NEVER_SEEN  = 0;
+        ONLINE  = 1;
+        OFFLINE  = 2;
+    }
+
+    message Gateway {
+        string gateway_id = 1;
+        string name = 2;
+        string description = 3;
+        common.Location location = 4;
+        string tenant_id = 5;
+        map<string,string> tags = 6;
+        map<string,string> metadata = 7;
+        uint32 stats_interval = 8;
+
+    }
+
+    message GatewayListItem {
+        string tenant_id = 1;
+        string gateway_id = 2;
+        string name = 3;
+        string description = 4;
+        common.Location location = 5;
+        map<string,string> properties = 6;
+        Timestamp created_at = 7;
+        Timestamp updated_at = 8;
+        Timestamp last_seen_at = 9;
+        GatewayState state = 10;
+
+    }
+
+    message CreateGatewayRequest {
+        Gateway gateway = 1;
+
+    }
+
+    message GetGatewayRequest {
+        string gateway_id = 1;
+
+    }
+
+    message GetGatewayResponse {
+        Gateway gateway = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        Timestamp last_seen_at = 4;
+
+    }
+
+    message UpdateGatewayRequest {
+        Gateway gateway = 1;
+
+    }
+
+    message DeleteGatewayRequest {
+        string gateway_id = 1;
+
+    }
+
+    message ListGatewaysRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string tenant_id = 4;
+        string multicast_group_id = 5;
+
+    }
+
+    message ListGatewaysResponse {
+        uint32 total_count = 1;
+        repeated GatewayListItem result = 2;
+
+    }
+
+    message GenerateGatewayClientCertificateRequest {
+        string gateway_id = 1;
+
+    }
+
+    message GenerateGatewayClientCertificateResponse {
+        string tls_cert = 1;
+        string tls_key = 2;
+        string ca_cert = 3;
+        Timestamp expires_at = 4;
+
+    }
+
+    message GetGatewayMetricsRequest {
+        string gateway_id = 1;
+        Timestamp start = 2;
+        Timestamp end = 3;
+        common.Aggregation aggregation = 4;
+
+    }
+
+    message GetGatewayMetricsResponse {
+        common.Metric rx_packets = 1;
+        common.Metric tx_packets = 2;
+        common.Metric tx_packets_per_freq = 3;
+        common.Metric rx_packets_per_freq = 4;
+        common.Metric tx_packets_per_dr = 5;
+        common.Metric rx_packets_per_dr = 6;
+        common.Metric tx_packets_per_status = 7;
+
+    }
+
+    message GetGatewayDutyCycleMetricsRequest {
+        string gateway_id = 1;
+        Timestamp start = 2;
+        Timestamp end = 3;
+
+    }
+
+    message GetGatewayDutyCycleMetricsResponse {
+        common.Metric max_load_percentage = 1;
+        common.Metric window_percentage = 2;
+
+    }
+
+
+    message ApiKey {
+        string id = 1;
+        string name = 2;
+        bool is_admin = 3;
+        string tenant_id = 4;
+
+    }
+
+    message CreateApiKeyRequest {
+        ApiKey api_key = 1;
+
+    }
+
+    message CreateApiKeyResponse {
+        string id = 1;
+        string token = 2;
+
+    }
+
+    message DeleteApiKeyRequest {
+        string id = 1;
+
+    }
+
+    message ListApiKeysRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        bool is_admin = 3;
+        string tenant_id = 4;
+
+    }
+
+    message ListApiKeysResponse {
+        uint32 total_count = 1;
+        repeated ApiKey result = 2;
+
+    }
+
+    message UserTenantLink {
+        Timestamp created_at = 1;
+        Timestamp updated_at = 2;
+        string tenant_id = 3;
+        bool is_admin = 4;
+        bool is_device_admin = 5;
+        bool is_gateway_admin = 6;
+
+    }
+
+    message LoginRequest {
+        string email = 1;
+        string password = 2;
+
+    }
+
+    message LoginResponse {
+        string jwt = 1;
+
+    }
+
+    message ProfileResponse {
+        User user = 1;
+        repeated UserTenantLink tenants = 3;
+
+    }
+
+    message GlobalSearchRequest {
+        string search = 1;
+        int64 limit = 2;
+        int64 offset = 3;
+
+    }
+
+    message GlobalSearchResponse {
+        repeated GlobalSearchResult result = 1;
+
+    }
+
+    message GlobalSearchResult {
+        string kind = 1;
+        float score = 2;
+        string tenant_id = 3;
+        string tenant_name = 4;
+        string application_id = 5;
+        string application_name = 6;
+        string device_dev_eui = 7;
+        string device_name = 8;
+        string gateway_id = 9;
+        string gateway_name = 10;
+
+    }
+
+    message SettingsResponse {
+        OpenIdConnect openid_connect = 1;
+        OAuth2 oauth2 = 2;
+
+    }
+
+    message OpenIdConnect {
+        bool enabled = 1;
+        string login_url = 2;
+        string login_label = 3;
+        string logout_url = 4;
+        bool login_redirect = 5;
+
+    }
+
+    message OAuth2 {
+        bool enabled = 1;
+        string login_url = 2;
+        string login_label = 3;
+        string logout_url = 4;
+        bool login_redirect = 5;
+
+    }
+
+    message OpenIdConnectLoginRequest {
+        string code = 1;
+        string state = 2;
+
+    }
+
+    message OpenIdConnectLoginResponse {
+        string token = 1;
+
+    }
+
+    message OAuth2LoginRequest {
+        string code = 1;
+        string state = 2;
+
+    }
+
+    message OAuth2LoginResponse {
+        string token = 1;
+
+    }
+
+    message GetDevicesSummaryRequest {
+        string tenant_id = 1;
+
+    }
+
+    message GetDevicesSummaryResponse {
+        uint32 active_count = 1;
+        uint32 inactive_count = 2;
+        map<uint32,uint32> dr_count = 3;
+        uint32 never_seen_count = 4;
+
+    }
+
+    message GetGatewaysSummaryRequest {
+        string tenant_id = 1;
+
+    }
+
+    message GetGatewaysSummaryResponse {
+        uint32 online_count = 1;
+        uint32 offline_count = 2;
+        uint32 never_seen_count = 3;
+
+    }
+
+    message LogItem {
+        string id = 1;
+        Timestamp time = 2;
+        string description = 3;
+        string body = 4;
+        map<string,string> properties = 5;
+
+    }
+
+    message StreamGatewayFramesRequest {
+        string gateway_id = 1;
+
+    }
+
+    message StreamDeviceFramesRequest {
+        string dev_eui = 1;
+
+    }
+
+    message StreamDeviceEventsRequest {
+        string dev_eui = 1;
+
+    }
+
+    message ListRegionsResponse {
+        repeated RegionListItem regions = 1;
+
+    }
+
+    message RegionListItem {
+        string id = 1;
+        common.Region region = 2;
+        string description = 3;
+
+    }
+
+    message GetRegionRequest {
+        string id = 1;
+
+    }
+
+    message GetRegionResponse {
+        string id = 1;
+        common.Region region = 2;
+        string user_info = 3;
+        repeated RegionChannel uplink_channels = 4;
+        uint32 rx1_delay = 5;
+        uint32 rx1_dr_offset = 6;
+        uint32 rx2_dr = 7;
+        uint32 rx2_frequency = 8;
+        uint32 class_b_ping_slot_dr = 9;
+        uint32 class_b_ping_slot_frequency = 10;
+        string description = 11;
+
+    }
+
+    message RegionChannel {
+        uint32 frequency = 1;
+        uint32 dr_min = 2;
+        uint32 dr_max = 3;
+
+    }
+
+    message GetVersionResponse {
+        string version = 1;
+
+    }
+
+
+    enum MulticastGroupType {
+        CLASS_C  = 0;
+        CLASS_B  = 1;
+    }
+
+    enum MulticastGroupSchedulingType {
+        DELAY  = 0;
+        GPS_TIME  = 1;
+    }
+
+    message MulticastGroup {
+        string id = 1;
+        string name = 2;
+        string application_id = 3;
+        common.Region region = 4;
+        string mc_addr = 5;
+        string mc_nwk_s_key = 6;
+        string mc_app_s_key = 7;
+        uint32 f_cnt = 8;
+        MulticastGroupType group_type = 9;
+        uint32 dr = 10;
+        uint32 frequency = 11;
+        uint32 class_b_ping_slot_period = 12;
+        MulticastGroupSchedulingType class_c_scheduling_type = 13;
+        uint32 class_b_ping_slot_nb_k = 14;
+
+    }
+
+    message MulticastGroupListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string name = 4;
+        common.Region region = 5;
+        MulticastGroupType group_type = 6;
+
+    }
+
+    message CreateMulticastGroupRequest {
+        MulticastGroup multicast_group = 1;
+
+    }
+
+    message CreateMulticastGroupResponse {
+        string id = 1;
+
+    }
+
+    message GetMulticastGroupRequest {
+        string id = 1;
+
+    }
+
+    message GetMulticastGroupResponse {
+        MulticastGroup multicast_group = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateMulticastGroupRequest {
+        MulticastGroup multicast_group = 1;
+
+    }
+
+    message DeleteMulticastGroupRequest {
+        string id = 1;
+
+    }
+
+    message ListMulticastGroupsRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string application_id = 4;
+
+    }
+
+    message ListMulticastGroupsResponse {
+        uint32 total_count = 1;
+        repeated MulticastGroupListItem result = 2;
+
+    }
+
+    message AddDeviceToMulticastGroupRequest {
+        string multicast_group_id = 1;
+        string dev_eui = 2;
+
+    }
+
+    message RemoveDeviceFromMulticastGroupRequest {
+        string multicast_group_id = 1;
+        string dev_eui = 2;
+
+    }
+
+    message AddGatewayToMulticastGroupRequest {
+        string multicast_group_id = 1;
+        string gateway_id = 2;
+
+    }
+
+    message RemoveGatewayFromMulticastGroupRequest {
+        string multicast_group_id = 1;
+        string gateway_id = 2;
+
+    }
+
+    message MulticastGroupQueueItem {
+        string multicast_group_id = 1;
+        uint32 f_cnt = 2;
+        uint32 f_port = 3;
+        bytes data = 4;
+
+    }
+
+    message EnqueueMulticastGroupQueueItemRequest {
+        MulticastGroupQueueItem queue_item = 1;
+
+    }
+
+    message EnqueueMulticastGroupQueueItemResponse {
+        uint32 f_cnt = 1;
+
+    }
+
+    message FlushMulticastGroupQueueRequest {
+        string multicast_group_id = 1;
+
+    }
+
+    message ListMulticastGroupQueueRequest {
+        string multicast_group_id = 1;
+
+    }
+
+    message ListMulticastGroupQueueResponse {
+        repeated MulticastGroupQueueItem items = 1;
+
+    }
+
+
+    message RelayListItem {
+        string dev_eui = 1;
+        string name = 2;
+
+    }
+
+    message ListRelaysRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string application_id = 3;
+
+    }
+
+    message ListRelaysResponse {
+        uint32 total_count = 1;
+        repeated RelayListItem result = 2;
+
+    }
+
+    message AddRelayDeviceRequest {
+        string relay_dev_eui = 1;
+        string device_dev_eui = 2;
+
+    }
+
+    message RemoveRelayDeviceRequest {
+        string relay_dev_eui = 1;
+        string device_dev_eui = 2;
+
+    }
+
+    message ListRelayDevicesRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string relay_dev_eui = 3;
+
+    }
+
+    message RelayDeviceListItem {
+        string dev_eui = 1;
+        Timestamp created_at = 2;
+        string name = 3;
+
+    }
+
+    message ListRelayDevicesResponse {
+        uint32 total_count = 1;
+        repeated RelayDeviceListItem result = 2;
+
+    }
+
+
+    message Tenant {
+        string id = 1;
+        string name = 2;
+        string description = 3;
+        bool can_have_gateways = 4;
+        uint32 max_gateway_count = 5;
+        uint32 max_device_count = 6;
+        bool private_gateways_up = 7;
+        bool private_gateways_down = 8;
+        map<string,string> tags = 9;
+
+    }
+
+    message TenantListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string name = 4;
+        bool can_have_gateways = 5;
+        bool private_gateways_up = 6;
+        uint32 max_gateway_count = 7;
+        uint32 max_device_count = 8;
+        bool private_gateways_down = 9;
+
+    }
+
+    message CreateTenantRequest {
+        Tenant tenant = 1;
+
+    }
+
+    message CreateTenantResponse {
+        string id = 1;
+
+    }
+
+    message GetTenantRequest {
+        string id = 1;
+
+    }
+
+    message GetTenantResponse {
+        Tenant tenant = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateTenantRequest {
+        Tenant tenant = 1;
+
+    }
+
+    message DeleteTenantRequest {
+        string id = 1;
+
+    }
+
+    message ListTenantsRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+        string search = 3;
+        string user_id = 4;
+
+    }
+
+    message ListTenantsResponse {
+        uint32 total_count = 1;
+        repeated TenantListItem result = 2;
+
+    }
+
+    message TenantUser {
+        string tenant_id = 1;
+        string user_id = 2;
+        bool is_admin = 3;
+        bool is_device_admin = 4;
+        bool is_gateway_admin = 5;
+        string email = 6;
+
+    }
+
+    message TenantUserListItem {
+        string tenant_id = 1;
+        string user_id = 2;
+        Timestamp created_at = 3;
+        Timestamp updated_at = 4;
+        string email = 5;
+        bool is_admin = 6;
+        bool is_device_admin = 7;
+        bool is_gateway_admin = 8;
+
+    }
+
+    message AddTenantUserRequest {
+        TenantUser tenant_user = 1;
+
+    }
+
+    message GetTenantUserRequest {
+        string tenant_id = 1;
+        string user_id = 2;
+
+    }
+
+    message GetTenantUserResponse {
+        TenantUser tenant_user = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateTenantUserRequest {
+        TenantUser tenant_user = 1;
+
+    }
+
+    message DeleteTenantUserRequest {
+        string tenant_id = 1;
+        string user_id = 2;
+
+    }
+
+    message ListTenantUsersRequest {
+        string tenant_id = 1;
+        uint32 limit = 2;
+        uint32 offset = 3;
+
+    }
+
+    message ListTenantUsersResponse {
+        uint32 total_count = 1;
+        repeated TenantUserListItem result = 2;
+
+    }
+
+
+    message User {
+        string id = 1;
+        bool is_admin = 4;
+        bool is_active = 5;
+        string email = 6;
+        string note = 7;
+
+    }
+
+    message UserListItem {
+        string id = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+        string email = 4;
+        bool is_admin = 5;
+        bool is_active = 6;
+
+    }
+
+    message UserTenant {
+        string tenant_id = 1;
+        bool is_admin = 2;
+        bool is_device_admin = 3;
+        bool is_gateway_admin = 4;
+
+    }
+
+    message CreateUserRequest {
+        User user = 1;
+        string password = 2;
+        repeated UserTenant tenants = 3;
+
+    }
+
+    message CreateUserResponse {
+        string id = 1;
+
+    }
+
+    message GetUserRequest {
+        string id = 1;
+
+    }
+
+    message GetUserResponse {
+        User user = 1;
+        Timestamp created_at = 2;
+        Timestamp updated_at = 3;
+
+    }
+
+    message UpdateUserRequest {
+        User user = 1;
+
+    }
+
+    message DeleteUserRequest {
+        string id = 1;
+
+    }
+
+    message ListUsersRequest {
+        uint32 limit = 1;
+        uint32 offset = 2;
+
+    }
+
+    message ListUsersResponse {
+        uint32 total_count = 1;
+        repeated UserListItem result = 2;
+
+    }
+
+    message UpdateUserPasswordRequest {
+        string user_id = 1;
+        string password = 2;
+
+    }
+
+
+}
+
+message common {
+    enum Modulation {
+        LORA  = 0;
+        FSK  = 1;
+        LR_FHSS  = 2;
+    }
+
+    enum Region {
+        EU868  = 0;
+        US915  = 2;
+        CN779  = 3;
+        EU433  = 4;
+        AU915  = 5;
+        CN470  = 6;
+        AS923  = 7;
+        AS923_2  = 12;
+        AS923_3  = 13;
+        AS923_4  = 14;
+        KR920  = 8;
+        IN865  = 9;
+        RU864  = 10;
+        ISM2400  = 11;
+    }
+
+    enum MType {
+        JOIN_REQUEST  = 0;
+        JOIN_ACCEPT  = 1;
+        UNCONFIRMED_DATA_UP  = 2;
+        UNCONFIRMED_DATA_DOWN  = 3;
+        CONFIRMED_DATA_UP  = 4;
+        CONFIRMED_DATA_DOWN  = 5;
+        REJOIN_REQUEST  = 6;
+        PROPRIETARY  = 7;
+    }
+
+    enum MacVersion {
+        LORAWAN_1_0_0  = 0;
+        LORAWAN_1_0_1  = 1;
+        LORAWAN_1_0_2  = 2;
+        LORAWAN_1_0_3  = 3;
+        LORAWAN_1_0_4  = 4;
+        LORAWAN_1_1_0  = 5;
+    }
+
+    enum RegParamsRevision {
+        A  = 0;
+        B  = 1;
+        RP002_1_0_0  = 2;
+        RP002_1_0_1  = 3;
+        RP002_1_0_2  = 4;
+        RP002_1_0_3  = 5;
+        RP002_1_0_4  = 6;
+    }
+
+    enum LocationSource {
+        UNKNOWN  = 0;
+        GPS  = 1;
+        CONFIG  = 2;
+        GEO_RESOLVER_TDOA  = 3;
+        GEO_RESOLVER_RSSI  = 4;
+        GEO_RESOLVER_GNSS  = 5;
+        GEO_RESOLVER_WIFI  = 6;
+    }
+
+    enum Aggregation {
+        HOUR  = 0;
+        DAY  = 1;
+        MONTH  = 2;
+        MINUTE  = 3;
+    }
+
+    enum MetricKind {
+        COUNTER  = 0;
+        ABSOLUTE  = 1;
+        GAUGE  = 2;
+    }
+
+    enum Regulation {
+        REGULATION_UNKNOWN  = 0;
+        ETSI_EN_300_220  = 1;
+    }
+
+    enum DeviceClass {
+        CLASS_A  = 0;
+        CLASS_B  = 1;
+        CLASS_C  = 2;
+    }
+
+    message Location {
+        double latitude = 1;
+        double longitude = 2;
+        double altitude = 3;
+        LocationSource source = 4;
+        float accuracy = 5;
+
+    }
+
+    message KeyEnvelope {
+        string kek_label = 1;
+        bytes aes_key = 2;
+
+    }
+
+    message Metric {
+        string name = 1;
+        repeated Timestamp timestamps = 2;
+        repeated MetricDataset datasets = 3;
+        MetricKind kind = 4;
+
+    }
+
+    message MetricDataset {
+        string label = 1;
+        repeated float data = 2;
+
+    }
+
+    message JoinServerContext {
+        string session_key_id = 1;
+        KeyEnvelope app_s_key = 2;
+
+    }
+
+
+}
+
+message google {
+    message api {
+        extend google.protobuf.MethodOptions {
+            HttpRule http = 72295728;
+        }
+
+        message Http {
+            repeated HttpRule rules = 1;
+            bool fully_decode_reserved_expansion = 2;
+
+        }
+
+        message HttpRule {
+            string selector = 1;
+            string get = 2;
+            string put = 3;
+            string post = 4;
+            string delete = 5;
+            string patch = 6;
+            string body = 7;
+            CustomHttpPattern custom = 8;
+            repeated HttpRule additional_bindings = 11;
+            string response_body = 12;
+
+        }
+
+        message CustomHttpPattern {
+            string kind = 1;
+            string path = 2;
+
+        }
+
+
+    }
+
+}
+
+message gw {
+    enum CodeRate {
+        CR_UNDEFINED  = 0;
+        CR_4_5  = 1;
+        CR_4_6  = 2;
+        CR_4_7  = 3;
+        CR_4_8  = 4;
+        CR_3_8  = 5;
+        CR_2_6  = 6;
+        CR_1_4  = 7;
+        CR_1_6  = 8;
+        CR_5_6  = 9;
+        CR_LI_4_5  = 10;
+        CR_LI_4_6  = 11;
+        CR_LI_4_8  = 12;
+    }
+
+    enum DownlinkTiming {
+        IMMEDIATELY  = 0;
+        DELAY  = 1;
+        GPS_EPOCH  = 2;
+    }
+
+    enum FineTimestampType {
+        NONE  = 0;
+        ENCRYPTED  = 1;
+        PLAIN  = 2;
+    }
+
+    enum CRCStatus {
+        NO_CRC  = 0;
+        BAD_CRC  = 1;
+        CRC_OK  = 2;
+    }
+
+    enum TxAckStatus {
+        IGNORED  = 0;
+        OK  = 1;
+        TOO_LATE  = 2;
+        TOO_EARLY  = 3;
+        COLLISION_PACKET  = 4;
+        COLLISION_BEACON  = 5;
+        TX_FREQ  = 6;
+        TX_POWER  = 7;
+        GPS_UNLOCKED  = 8;
+        QUEUE_FULL  = 9;
+        INTERNAL_ERROR  = 10;
+        DUTY_CYCLE_OVERFLOW  = 11;
+    }
+
+    message Modulation {
+        LoraModulationInfo lora = 3;
+        FskModulationInfo fsk = 4;
+        LrFhssModulationInfo lr_fhss = 5;
+
+    }
+
+    message UplinkTxInfoLegacy {
+        uint32 frequency = 1;
+        common.Modulation modulation = 2;
+        LoraModulationInfo lora_modulation_info = 3;
+        FskModulationInfo fsk_modulation_info = 4;
+        LrFhssModulationInfo lr_fhss_modulation_info = 5;
+
+    }
+
+    message UplinkTxInfo {
+        uint32 frequency = 1;
+        Modulation modulation = 2;
+
+    }
+
+    message LoraModulationInfo {
+        uint32 bandwidth = 1;
+        uint32 spreading_factor = 2;
+        string code_rate_legacy = 3;
+        bool polarization_inversion = 4;
+        CodeRate code_rate = 5;
+        uint32 preamble = 6;
+        bool no_crc = 7;
+
+    }
+
+    message FskModulationInfo {
+        uint32 frequency_deviation = 1;
+        uint32 datarate = 2;
+
+    }
+
+    message LrFhssModulationInfo {
+        uint32 operating_channel_width = 1;
+        string code_rate_legacy = 2;
+        uint32 grid_steps = 3;
+        CodeRate code_rate = 4;
+
+    }
+
+    message EncryptedFineTimestamp {
+        uint32 aes_key_index = 1;
+        bytes encrypted_ns = 2;
+        bytes fpga_id = 3;
+
+    }
+
+    message PlainFineTimestamp {
+        Timestamp time = 1;
+
+    }
+
+    message GatewayStats {
+        bytes gateway_id_legacy = 1;
+        Timestamp time = 2;
+        common.Location location = 3;
+        string config_version = 4;
+        uint32 rx_packets_received = 5;
+        uint32 rx_packets_received_ok = 6;
+        uint32 tx_packets_received = 7;
+        uint32 tx_packets_emitted = 8;
+        map<string,string> metadata = 10;
+        map<uint32,uint32> tx_packets_per_frequency = 12;
+        map<uint32,uint32> rx_packets_per_frequency = 13;
+        repeated PerModulationCount tx_packets_per_modulation = 14;
+        repeated PerModulationCount rx_packets_per_modulation = 15;
+        map<string,uint32> tx_packets_per_status = 16;
+        string gateway_id = 17;
+        DutyCycleStats duty_cycle_stats = 18;
+
+    }
+
+    message PerModulationCount {
+        Modulation modulation = 1;
+        uint32 count = 2;
+
+    }
+
+    message DutyCycleStats {
+        common.Regulation regulation = 1;
+        Duration window = 2;
+        repeated DutyCycleBand bands = 3;
+
+    }
+
+    message DutyCycleBand {
+        string name = 1;
+        uint32 frequency_min = 2;
+        uint32 frequency_max = 3;
+        Duration load_max = 4;
+        Duration load_tracked = 5;
+
+    }
+
+    message UplinkRxInfoLegacy {
+        bytes gateway_id = 1;
+        Timestamp time = 2;
+        Duration time_since_gps_epoch = 3;
+        int32 rssi = 5;
+        double lora_snr = 6;
+        uint32 channel = 7;
+        uint32 rf_chain = 8;
+        uint32 board = 9;
+        uint32 antenna = 10;
+        common.Location location = 11;
+        FineTimestampType fine_timestamp_type = 12;
+        EncryptedFineTimestamp encrypted_fine_timestamp = 13;
+        PlainFineTimestamp plain_fine_timestamp = 14;
+        bytes context = 15;
+        bytes uplink_id = 16;
+        CRCStatus crc_status = 17;
+        map<string,string> metadata = 18;
+
+    }
+
+    message UplinkRxInfo {
+        string gateway_id = 1;
+        uint32 uplink_id = 2;
+        Timestamp gw_time = 3;
+        Duration time_since_gps_epoch = 4;
+        Duration fine_time_since_gps_epoch = 5;
+        int32 rssi = 6;
+        float snr = 7;
+        uint32 channel = 8;
+        uint32 rf_chain = 9;
+        uint32 board = 10;
+        uint32 antenna = 11;
+        common.Location location = 12;
+        bytes context = 13;
+        map<string,string> metadata = 15;
+        CRCStatus crc_status = 16;
+        Timestamp ns_time = 17;
+
+    }
+
+    message DownlinkTxInfoLegacy {
+        bytes gateway_id = 1;
+        uint32 frequency = 5;
+        int32 power = 6;
+        common.Modulation modulation = 7;
+        LoraModulationInfo lora_modulation_info = 8;
+        FskModulationInfo fsk_modulation_info = 9;
+        uint32 board = 10;
+        uint32 antenna = 11;
+        DownlinkTiming timing = 12;
+        ImmediatelyTimingInfo immediately_timing_info = 13;
+        DelayTimingInfo delay_timing_info = 14;
+        GPSEpochTimingInfo gps_epoch_timing_info = 15;
+        bytes context = 16;
+
+    }
+
+    message DownlinkTxInfo {
+        uint32 frequency = 1;
+        int32 power = 2;
+        Modulation modulation = 3;
+        uint32 board = 4;
+        uint32 antenna = 5;
+        Timing timing = 6;
+        bytes context = 7;
+
+    }
+
+    message Timing {
+        ImmediatelyTimingInfo immediately = 1;
+        DelayTimingInfo delay = 2;
+        GPSEpochTimingInfo gps_epoch = 3;
+
+    }
+
+    message ImmediatelyTimingInfo {
+
+    }
+
+    message DelayTimingInfo {
+        Duration delay = 1;
+
+    }
+
+    message GPSEpochTimingInfo {
+        Duration time_since_gps_epoch = 1;
+
+    }
+
+    message UplinkFrame {
+        bytes phy_payload = 1;
+        UplinkTxInfoLegacy tx_info_legacy = 2;
+        UplinkRxInfoLegacy rx_info_legacy = 3;
+        UplinkTxInfo tx_info = 4;
+        UplinkRxInfo rx_info = 5;
+
+    }
+
+    message UplinkFrameSet {
+        bytes phy_payload = 1;
+        UplinkTxInfo tx_info = 2;
+        repeated UplinkRxInfo rx_info = 3;
+
+    }
+
+    message DownlinkFrame {
+        uint32 downlink_id = 3;
+        bytes downlink_id_legacy = 4;
+        repeated DownlinkFrameItem items = 5;
+        bytes gateway_id_legacy = 6;
+        string gateway_id = 7;
+
+    }
+
+    message DownlinkFrameItem {
+        bytes phy_payload = 1;
+        DownlinkTxInfoLegacy tx_info_legacy = 2;
+        DownlinkTxInfo tx_info = 3;
+
+    }
+
+    message DownlinkTxAck {
+        bytes gateway_id_legacy = 1;
+        uint32 downlink_id = 2;
+        bytes downlink_id_legacy = 4;
+        repeated DownlinkTxAckItem items = 5;
+        string gateway_id = 6;
+
+    }
+
+    message DownlinkTxAckItem {
+        TxAckStatus status = 1;
+
+    }
+
+    message GatewayConfiguration {
+        bytes gateway_id_legacy = 1;
+        string version = 2;
+        repeated ChannelConfiguration channels = 3;
+        Duration stats_interval = 4;
+        string gateway_id = 5;
+
+    }
+
+    message ChannelConfiguration {
+        uint32 frequency = 1;
+        common.Modulation modulation_legacy = 2;
+        LoraModulationConfig lora_modulation_config = 3;
+        FskModulationConfig fsk_modulation_config = 4;
+        uint32 board = 5;
+        uint32 demodulator = 6;
+
+    }
+
+    message LoraModulationConfig {
+        uint32 bandwidth_legacy = 1;
+        repeated uint32 spreading_factors = 2;
+        uint32 bandwidth = 3;
+
+    }
+
+    message FskModulationConfig {
+        uint32 bandwidth_legacy = 1;
+        uint32 bitrate = 2;
+        uint32 bandwidth = 3;
+
+    }
+
+    message GatewayCommandExecRequest {
+        bytes gateway_id_legacy = 1;
+        string command = 2;
+        bytes stdin = 4;
+        map<string,string> environment = 5;
+        string gateway_id = 6;
+        uint32 exec_id = 7;
+
+    }
+
+    message GatewayCommandExecResponse {
+        bytes gateway_id_legacy = 1;
+        bytes stdout = 3;
+        bytes stderr = 4;
+        string error = 5;
+        string gateway_id = 6;
+        uint32 exec_id = 7;
+
+    }
+
+    message RawPacketForwarderEvent {
+        bytes gateway_id_legacy = 1;
+        bytes payload = 3;
+        string gateway_id = 4;
+
+    }
+
+    message RawPacketForwarderCommand {
+        bytes gateway_id_legacy = 1;
+        bytes payload = 3;
+        string gateway_id = 4;
+
+    }
+
+    message ConnState {
+        bytes gateway_id_legacy = 1;
+        State state = 2;
+        string gateway_id = 3;
+
+        enum State {
+            OFFLINE  = 0;
+            ONLINE  = 1;
+        }
+
+    }
+
+
+}
+
+

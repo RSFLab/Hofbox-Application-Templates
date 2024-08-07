@@ -1,0 +1,298 @@
+[
+    {
+        "id": "5b9ffd14d0f8bf07",
+        "type": "ui_worldmap",
+        "z": "bc8d37b0.7b6b58",
+        "group": "1244b8c621c0a9dc",
+        "order": 1,
+        "width": "27",
+        "height": "17",
+        "name": "",
+        "lat": "49.369492",
+        "lon": "8.18711",
+        "zoom": "6",
+        "layer": "OSMG",
+        "cluster": "",
+        "maxage": "",
+        "usermenu": "hide",
+        "layers": "show",
+        "panit": "false",
+        "panlock": "false",
+        "zoomlock": "false",
+        "hiderightclick": "true",
+        "coords": "dms",
+        "showgrid": "false",
+        "showruler": "true",
+        "allowFileDrop": "false",
+        "path": "/worldmap_test",
+        "overlist": "DR,CO,RA,DN,HM",
+        "maplist": "OSMG,OSMC,EsriC,EsriS,EsriT,EsriDG,UKOS",
+        "mapname": "",
+        "mapurl": "",
+        "mapopt": "",
+        "mapwms": false,
+        "x": 1080,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "95bb18f8f940b1ef",
+        "type": "inject",
+        "z": "bc8d37b0.7b6b58",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 230,
+        "y": 620,
+        "wires": [
+            [
+                "86da72a5e5c85847"
+            ]
+        ]
+    },
+    {
+        "id": "86da72a5e5c85847",
+        "type": "function",
+        "z": "bc8d37b0.7b6b58",
+        "name": "add new layer",
+        "func": "msg.payload = {};\nmsg.payload.command = {};\n\nvar u = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png';\nvar o = JSON.stringify({ maxZoom: 19, attribution: '&copy; OpenStreetMap'});\n\nmsg.payload.command.map = {name:\"OSMhot\", url:u, opt:o};\nmsg.payload.command.layer = \"OSMhot\";\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 620,
+        "wires": [
+            [
+                "5b9ffd14d0f8bf07"
+            ]
+        ]
+    },
+    {
+        "id": "9f2a34780ce739e6",
+        "type": "function",
+        "z": "bc8d37b0.7b6b58",
+        "name": "move and zoom",
+        "func": "msg.payload = { command: { layer: \"Esri Terrain\", lat: 49.3694915783208, lon: 8.18711042,zoom:12} };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 460,
+        "y": 680,
+        "wires": [
+            [
+                "5b9ffd14d0f8bf07"
+            ]
+        ]
+    },
+    {
+        "id": "771dc54a68cd855a",
+        "type": "inject",
+        "z": "bc8d37b0.7b6b58",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 230,
+        "y": 680,
+        "wires": [
+            [
+                "9f2a34780ce739e6"
+            ]
+        ]
+    },
+    {
+        "id": "dd945b8de6cbe594",
+        "type": "function",
+        "z": "bc8d37b0.7b6b58",
+        "name": "Add sensor to map",
+        "func": "\n let   deviceName   = msg.payload[\"deviceInfo\"][\"deviceName\"];\n let   tempShtValue = msg.payload[\"object\"]['TempC_SHT'];\n let   humShtValue  = msg.payload[\"object\"]['Hum_SHT'];\n let   lat1          = msg.payload.rxInfo[0].location.latitude;\n let   lon1          = msg.payload.rxInfo[0].location.longitude;\n    \n  tempShtValue = Math.round(tempShtValue * 100) / 100;\nhumShtValue = Math.round(humShtValue * 100) / 100;\n\nvar thing = {\n   name: \"Sensor\" + \"\\t\" + deviceName,\n    lat: lat1,\n    lon: lon1,\n    icon: \"sensor\",\n    iconColor: \"darkred\",\n  \"Temp\": tempShtValue + \"°C\" ,\n  \"rel. Luftfeuchte\": humShtValue + \"%\" \n    //clickable:true\n};\n\nmsg.payload = thing;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 740,
+        "wires": [
+            [
+                "5b9ffd14d0f8bf07"
+            ]
+        ]
+    },
+    {
+        "id": "3d97b8bffccc32b5",
+        "type": "inject",
+        "z": "bc8d37b0.7b6b58",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "{\"deduplicationId\":\"7c87988a-91b5-4585-83e3-1650fef632c7\",\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"deviceInfo\":{\"tenantId\":\"52f14cd4-c6f1-4fbd-8f87-4025e1d49242\",\"tenantName\":\"ChirpStack\",\"applicationId\":\"20eb5b3e-ebba-4ed8-b869-7b09b886d02f\",\"applicationName\":\"AS_Sensor\",\"deviceProfileId\":\"c2b81312-5a41-4303-921d-749935f649b4\",\"deviceProfileName\":\"AS_Temp_RH\",\"deviceName\":\"TZ_TA_RH2\",\"devEui\":\"a840414f718578e6\"},\"devAddr\":\"0022941c\",\"adr\":true,\"dr\":5,\"fCnt\":10147,\"fPort\":2,\"data\":\"Dl8AAAEiAADMAkI=\",\"object\":{\"Work_mode\":\"IIC\",\"ADC_CH0V\":0.28999999165534973,\"TempC1\":0,\"Door_status\":\"OPEN\",\"Digital_IStatus\":\"L\",\"Hum_SHT\":57.79999923706055,\"BatV\":3.678999900817871,\"EXTI_Trigger\":\"FALSE\",\"TempC_SHT\":20.399999618530273},\"rxInfo\":[{\"gatewayId\":\"a84041ffff21b07c\",\"uplinkId\":10605,\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"rssi\":-84,\"snr\":9.800000190734863,\"channel\":1,\"rfChain\":1,\"location\":{\"latitude\":49.3694915783208,\"longitude\":8.18711042404175},\"context\":\"PqUT2w==\",\"metadata\":{\"region_common_name\":\"EU868\",\"region_name\":\"eu868\"}}],\"txInfo\":{\"frequency\":\"868300000\",\"modulation\":{\"lora\":{\"bandwidth\":125000,\"spreadingFactor\":7,\"codeRate\":\"CR_4_5\"}}}}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 740,
+        "wires": [
+            [
+                "dd945b8de6cbe594"
+            ]
+        ]
+    },
+    {
+        "id": "566e08b9ef35ebe7",
+        "type": "function",
+        "z": "bc8d37b0.7b6b58",
+        "name": "Add sensor to map",
+        "func": "\n let   deviceName   = msg.payload[\"deviceInfo\"][\"deviceName\"];\n let   tempShtValue = msg.payload[\"object\"]['TempC_SHT'];\n let   humShtValue  = msg.payload[\"object\"]['Hum_SHT'];\n let   lat1          = msg.payload.rxInfo[0].location.latitude;\n let   lon1          = msg.payload.rxInfo[0].location.longitude;\n    \n  tempShtValue = Math.round(tempShtValue * 100) / 100;\nhumShtValue = Math.round(humShtValue * 100) / 100;\n\nvar thing = {\n   name: \"Sensor\" + \"\\t\" + deviceName,\n    lat: lat1,\n    lon: lon1,\n    icon: \"sensor\",\n    iconColor: \"darkred\",\n  \"Temp\": tempShtValue + \"°C\" ,\n  \"rel. Luftfeuchte\": humShtValue + \"%\" \n    //clickable:true\n};\n\nmsg.payload = thing;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 550,
+        "y": 820,
+        "wires": [
+            [
+                "5b9ffd14d0f8bf07"
+            ]
+        ]
+    },
+    {
+        "id": "f2cf687aab4449eb",
+        "type": "inject",
+        "z": "bc8d37b0.7b6b58",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "{\"deduplicationId\":\"7c87988a-91b5-4585-83e3-1650fef632c7\",\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"deviceInfo\":{\"tenantId\":\"52f14cd4-c6f1-4fbd-8f87-4025e1d49242\",\"tenantName\":\"ChirpStack\",\"applicationId\":\"20eb5b3e-ebba-4ed8-b869-7b09b886d02f\",\"applicationName\":\"AS_Sensor\",\"deviceProfileId\":\"c2b81312-5a41-4303-921d-749935f649b4\",\"deviceProfileName\":\"AS_Temp_RH\",\"deviceName\":\"AS_TA_RH1\",\"devEui\":\"a840414f718578e6\"},\"devAddr\":\"0022941c\",\"adr\":true,\"dr\":5,\"fCnt\":10147,\"fPort\":2,\"data\":\"Dl8AAAEiAADMAkI=\",\"object\":{\"Work_mode\":\"IIC\",\"ADC_CH0V\":0.28999999165534973,\"TempC1\":0,\"Door_status\":\"OPEN\",\"Digital_IStatus\":\"L\",\"Hum_SHT\":57.79999923706055,\"BatV\":3.678999900817871,\"EXTI_Trigger\":\"FALSE\",\"TempC_SHT\":20.399999618530273},\"rxInfo\":[{\"gatewayId\":\"a84041ffff21b07c\",\"uplinkId\":10605,\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"rssi\":-84,\"snr\":9.800000190734863,\"channel\":1,\"rfChain\":1,\"location\":{\"latitude\":49.3694915783310,\"longitude\":8.18721042404188},\"context\":\"PqUT2w==\",\"metadata\":{\"region_common_name\":\"EU868\",\"region_name\":\"eu868\"}}],\"txInfo\":{\"frequency\":\"868300000\",\"modulation\":{\"lora\":{\"bandwidth\":125000,\"spreadingFactor\":7,\"codeRate\":\"CR_4_5\"}}}}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 820,
+        "wires": [
+            [
+                "566e08b9ef35ebe7"
+            ]
+        ]
+    },
+    {
+        "id": "f85f639eaa97e988",
+        "type": "function",
+        "z": "bc8d37b0.7b6b58",
+        "name": "Add sensor to map",
+        "func": "\n let   deviceName   = msg.payload[\"deviceInfo\"][\"deviceName\"];\n let   tempShtValue = msg.payload[\"object\"]['TempC_SHT'];\n let   humShtValue  = msg.payload[\"object\"]['Hum_SHT'];\n let   lat1          = msg.payload.rxInfo[0].location.latitude;\n let   lon1          = msg.payload.rxInfo[0].location.longitude;\n    \n  tempShtValue = Math.round(tempShtValue * 100) / 100;\nhumShtValue = Math.round(humShtValue * 100) / 100;\n\nvar thing = {\n   name: \"Sensor\" + \"\\t\" + deviceName,\n    lat: lat1,\n    lon: lon1,\n    icon: \"sensor\",\n    iconColor: \"darkred\",\n  \"Temp\": tempShtValue + \"°C\" ,\n  \"rel. Luftfeuchte\": humShtValue + \"%\" \n    //clickable:true\n};\n\nmsg.payload = thing;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 880,
+        "wires": [
+            [
+                "5b9ffd14d0f8bf07"
+            ]
+        ]
+    },
+    {
+        "id": "268334410296edae",
+        "type": "inject",
+        "z": "bc8d37b0.7b6b58",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "{\"deduplicationId\":\"7c87988a-91b5-4585-83e3-1650fef632c7\",\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"deviceInfo\":{\"tenantId\":\"52f14cd4-c6f1-4fbd-8f87-4025e1d49242\",\"tenantName\":\"ChirpStack\",\"applicationId\":\"20eb5b3e-ebba-4ed8-b869-7b09b886d02f\",\"applicationName\":\"AS_Sensor\",\"deviceProfileId\":\"c2b81312-5a41-4303-921d-749935f649b4\",\"deviceProfileName\":\"TZ_Temp_RH\",\"deviceName\":\"TZ_TA_RH\",\"devEui\":\"a840414f718578e6\"},\"devAddr\":\"0022941c\",\"adr\":true,\"dr\":5,\"fCnt\":10147,\"fPort\":2,\"data\":\"Dl8AAAEiAADMAkI=\",\"object\":{\"Work_mode\":\"IIC\",\"ADC_CH0V\":0.28999999165534973,\"TempC1\":0,\"Door_status\":\"OPEN\",\"Digital_IStatus\":\"L\",\"Hum_SHT\":57.79999923706055,\"BatV\":3.678999900817871,\"EXTI_Trigger\":\"FALSE\",\"TempC_SHT\":20.399999618530273},\"rxInfo\":[{\"gatewayId\":\"a84041ffff21b07c\",\"uplinkId\":10605,\"time\":\"2024-06-05T08:11:02.847884+00:00\",\"rssi\":-84,\"snr\":9.800000190734863,\"channel\":1,\"rfChain\":1,\"location\":{\"latitude\":49.374915783310,\"longitude\":8.18721042404188},\"context\":\"PqUT2w==\",\"metadata\":{\"region_common_name\":\"EU868\",\"region_name\":\"eu868\"}}],\"txInfo\":{\"frequency\":\"868300000\",\"modulation\":{\"lora\":{\"bandwidth\":125000,\"spreadingFactor\":7,\"codeRate\":\"CR_4_5\"}}}}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 880,
+        "wires": [
+            [
+                "f85f639eaa97e988"
+            ]
+        ]
+    },
+    {
+        "id": "1244b8c621c0a9dc",
+        "type": "ui_group",
+        "name": "Sensors-Map",
+        "tab": "1d6375ea34be1761",
+        "order": 1,
+        "disp": true,
+        "width": "29",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1d6375ea34be1761",
+        "type": "ui_tab",
+        "name": "WebMap",
+        "icon": "dashboard",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    }
+]

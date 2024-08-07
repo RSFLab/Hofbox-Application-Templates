@@ -1,0 +1,331 @@
+[
+    {
+        "id": "ef6d0eda1611d90d",
+        "type": "tab",
+        "label": "flow_expeer",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "16402a83fbce5f1e",
+        "type": "group",
+        "z": "ef6d0eda1611d90d",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "1f6afdd749fd872c",
+            "de27f805f74404a0",
+            "d1835564cbde13c7",
+            "cfc42a7a04687f29",
+            "0eb4090f8f22756e",
+            "607b6608d4db7d20",
+            "538740fa578ae1ea",
+            "4cf0a471ab4149f2",
+            "c3ba51c9643b6df8",
+            "3bb942eada4af20c",
+            "314c64fb41ee88ae",
+            "780da315d43796ec",
+            "34f95573b8893430"
+        ],
+        "x": 74,
+        "y": 179,
+        "w": 1412,
+        "h": 162
+    },
+    {
+        "id": "1f6afdd749fd872c",
+        "type": "mqtt in",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "",
+        "topic": "application/+/device/+/event/up",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "273b2ed09bcf70d2",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 230,
+        "y": 280,
+        "wires": [
+            [
+                "607b6608d4db7d20"
+            ]
+        ]
+    },
+    {
+        "id": "de27f805f74404a0",
+        "type": "switch",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "Device type",
+        "property": "payload.object",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "TempC_SHT",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "ullage_cm",
+                "vt": "str"
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 670,
+        "y": 280,
+        "wires": [
+            [
+                "d1835564cbde13c7"
+            ],
+            [
+                "cfc42a7a04687f29"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d1835564cbde13c7",
+        "type": "function",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "rh_ta_sensor-data flow",
+        "func": "var timestamp = new Date().toISOString();\n//local date\nvar date = new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' });\n// local time\nvar time = new Date().toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin' });\nlet timestamp_d = date + \" \" + time;\n\n// Extract device name etc. from the payload\nconst deviceName = msg.payload[\"deviceInfo\"][\"deviceName\"];\nconst tempShtValue = msg.payload[\"object\"]['TempC_SHT'];\nconst humShtValue = msg.payload[\"object\"]['Hum_SHT'];\nconst lat = msg.payload[\"rxinfo\"][\"location\"][\"latitude\"] ;\nconst long =msg.payload[\"rxinfo\"][\"location\"][\"longitude\"] ;\n\n\nconst extractedValues = {\n   devName: deviceName,\n   date: date,\n   time: time, \n   rh: humShtValue,\n   ta: tempShtValue,\n   timestamp_utc: timestamp\n};\n\nmsg.payload = extractedValues;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 260,
+        "wires": [
+            [
+                "538740fa578ae1ea"
+            ]
+        ]
+    },
+    {
+        "id": "cfc42a7a04687f29",
+        "type": "function",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "distance_sensor-data flow",
+        "func": "var timestamp = new Date().toISOString();\n//local date\nvar date = new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' });\n// local time\nvar time = new Date().toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin' });\nlet timestamp_d = date + \" \" + time;\n\n// Extract device name etc. from the payload\nconst deviceName = msg.payload[\"deviceInfo\"][\"deviceName\"];\nconst distValue = msg.payload['object']['ullage_cm'];\nconst tempC = msg.payload['object']['temp_C'];\nconst bat = msg.payload['object']['bat_pct'];\n\n\nconst extractedValues = {\n   devName: deviceName,\n   date: date,\n   time: time, \n   abstand_cm: distValue,\n   ta: tempC,\n   timestamp_utc: timestamp\n};\n\nmsg.payload = extractedValues;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 300,
+        "wires": [
+            [
+                "c3ba51c9643b6df8"
+            ]
+        ]
+    },
+    {
+        "id": "0eb4090f8f22756e",
+        "type": "comment",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "von Chirpstack (Protobuf)",
+        "info": "",
+        "x": 250,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "607b6608d4db7d20",
+        "type": "decode",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "Protobuf to JSON",
+        "protofile": "11e5118b6f93c75d",
+        "protoType": "UplinkEvent",
+        "x": 490,
+        "y": 280,
+        "wires": [
+            [
+                "de27f805f74404a0"
+            ]
+        ]
+    },
+    {
+        "id": "538740fa578ae1ea",
+        "type": "mongodb4",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "clientNode": "0ffc95f2db76bb59",
+        "mode": "collection",
+        "collection": "ta_rh",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "ta_rh",
+        "x": 1170,
+        "y": 260,
+        "wires": [
+            [
+                "4cf0a471ab4149f2"
+            ]
+        ]
+    },
+    {
+        "id": "4cf0a471ab4149f2",
+        "type": "debug",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "debug 96",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1380,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "c3ba51c9643b6df8",
+        "type": "mongodb4",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "clientNode": "0ffc95f2db76bb59",
+        "mode": "collection",
+        "collection": "abstand",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "abstand",
+        "x": 1180,
+        "y": 300,
+        "wires": [
+            [
+                "4cf0a471ab4149f2"
+            ]
+        ]
+    },
+    {
+        "id": "3bb942eada4af20c",
+        "type": "comment",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "Decoder",
+        "info": "",
+        "x": 500,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "314c64fb41ee88ae",
+        "type": "comment",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "Sensor type switch",
+        "info": "",
+        "x": 690,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "780da315d43796ec",
+        "type": "comment",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "Extracting - desired parameters",
+        "info": "",
+        "x": 930,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "34f95573b8893430",
+        "type": "comment",
+        "z": "ef6d0eda1611d90d",
+        "g": "16402a83fbce5f1e",
+        "name": "To Databank",
+        "info": "",
+        "x": 1190,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "273b2ed09bcf70d2",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "11e5118b6f93c75d",
+        "type": "protobuf-file",
+        "protopath": "./node_modules/node-red-contrib-protobuf/test/assets/chirpstack_integration_one_v4.proto",
+        "watchFile": true,
+        "keepCase": false
+    },
+    {
+        "id": "0ffc95f2db76bb59",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "localhost",
+        "port": "27017",
+        "dbName": "data",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    }
+]

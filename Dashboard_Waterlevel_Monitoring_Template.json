@@ -1,0 +1,1800 @@
+[
+    {
+        "id": "267f24253b30916f",
+        "type": "tab",
+        "label": "test_dashboard_landrat",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b73381def6335361",
+        "type": "group",
+        "z": "267f24253b30916f",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "f87e99e0ad4f8ed2",
+            "becbac9540389ca4",
+            "4b357745feae8dbe",
+            "06d47e08bd565be2",
+            "114f59948bcf7bcc",
+            "438b32f762556b3b",
+            "e78ad8ceae010c2a",
+            "887c11fc5c8e7492",
+            "8ff622e8130d6fe0",
+            "77dc5145a30e0932",
+            "91ef0afb1e4d3d4f"
+        ],
+        "x": 334,
+        "y": 379,
+        "w": 812,
+        "h": 162
+    },
+    {
+        "id": "7ac3063d05911b04",
+        "type": "group",
+        "z": "267f24253b30916f",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "your_switch_node_id",
+            "f48b6f3c1098500c",
+            "53f160ec6e80c1df",
+            "c66a12328de496a7",
+            "c2582701c083d6c4",
+            "622241ae5f30da4c",
+            "c5d2fda90878bfaa",
+            "tekelek_wasserstand_01_output",
+            "ca9a68414a468a15"
+        ],
+        "x": 334,
+        "y": 159,
+        "w": 852,
+        "h": 162
+    },
+    {
+        "id": "fd3496efac809f95",
+        "type": "group",
+        "z": "267f24253b30916f",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "a69e46d48da8968f",
+            "eab52b90.8c50f8",
+            "39e4e17f.49be46",
+            "5884fde412f778a6",
+            "7c13f7bebf16a3c1",
+            "1fd481330f9eb53b",
+            "e16e59ce449cf45f",
+            "eaad3fe979205b4e",
+            "1f234d547ed14632",
+            "ce1b9897d2e5c47f",
+            "3cbad6bb51e4d008",
+            "3ae637edebbc7503",
+            "8322f999b2d73224",
+            "0d9fbe11f8372cf2",
+            "e8d5552341aa443e",
+            "858c3ea4a7e2d176"
+        ],
+        "x": 294,
+        "y": 579,
+        "w": 852,
+        "h": 322
+    },
+    {
+        "id": "d7cce873f020db7d",
+        "type": "mqtt in",
+        "z": "267f24253b30916f",
+        "name": "landrat sensors",
+        "topic": "application/a5fa6a19-2fb4-489d-8879-644385769c71/#",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "5838057d01289d1c",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 80,
+        "y": 260,
+        "wires": [
+            [
+                "f48b6f3c1098500c",
+                "eab52b90.8c50f8",
+                "5884fde412f778a6",
+                "e16e59ce449cf45f"
+            ]
+        ]
+    },
+    {
+        "id": "your_switch_node_id",
+        "type": "switch",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "Device Name",
+        "property": "payload.devName",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Tekelek_Wasserstand_01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Tekelek_Wasserstand_02",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Tekelek_Wasserstand_03",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 700,
+        "y": 240,
+        "wires": [
+            [
+                "53f160ec6e80c1df"
+            ],
+            [
+                "c66a12328de496a7"
+            ],
+            [
+                "c2582701c083d6c4"
+            ]
+        ]
+    },
+    {
+        "id": "f48b6f3c1098500c",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "distance_sensor-data flow",
+        "func": "var timestamp = new Date().toISOString();\n//local date\nvar date = new Date().toLocaleDateString('de-DE', { timeZone: 'Europe/Berlin' });\n// local time\nvar time = new Date().toLocaleTimeString('de-DE', { timeZone: 'Europe/Berlin' });\n\n\n// Extract device name etc.  from the payload\nconst deviceName = msg.payload[\"deviceInfo\"][\"deviceName\"];\nconst distValue = msg.payload[\"object\"]['ullage_cm'];\nconst tempC = msg.payload[\"object\"]['temp_C'];\nconst bat = msg.payload[\"object\"]['bat_pct'];\n\n\n\n// Create a new object with extracted values and timestamp\nconst extractedValues = {\n   devName :deviceName,\n  timestamp: timestamp , \n  date: date,\n  time: time,\n dist_cm: distValue,\n ta :tempC\n};\n\n\nmsg.payload = extractedValues;\n\nreturn msg;\n\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 240,
+        "wires": [
+            [
+                "your_switch_node_id"
+            ]
+        ]
+    },
+    {
+        "id": "53f160ec6e80c1df",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor1",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-01",
+        "x": 910,
+        "y": 200,
+        "wires": [
+            [
+                "tekelek_wasserstand_01_output",
+                "f87e99e0ad4f8ed2"
+            ]
+        ]
+    },
+    {
+        "id": "c66a12328de496a7",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor2",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-02",
+        "x": 910,
+        "y": 240,
+        "wires": [
+            [
+                "c5d2fda90878bfaa",
+                "06d47e08bd565be2"
+            ]
+        ]
+    },
+    {
+        "id": "c2582701c083d6c4",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor3",
+        "operation": "insertOne",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-03",
+        "x": 910,
+        "y": 280,
+        "wires": [
+            [
+                "622241ae5f30da4c",
+                "e78ad8ceae010c2a"
+            ]
+        ]
+    },
+    {
+        "id": "622241ae5f30da4c",
+        "type": "debug",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "tek-03",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "c5d2fda90878bfaa",
+        "type": "debug",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "tek-02",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "tekelek_wasserstand_01_output",
+        "type": "debug",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "tek-01",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "f87e99e0ad4f8ed2",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor1",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-01",
+        "x": 870,
+        "y": 420,
+        "wires": [
+            [
+                "4b357745feae8dbe"
+            ]
+        ]
+    },
+    {
+        "id": "becbac9540389ca4",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "name": "select all",
+        "func": "msg.topic = \"find\";\nmsg.payload = {}; // Empty object for the query filter\nreturn msg;\n\n//db.collection('test').find({})\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 420,
+        "wires": [
+            [
+                "f87e99e0ad4f8ed2"
+            ]
+        ]
+    },
+    {
+        "id": "4b357745feae8dbe",
+        "type": "ui_table",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "group": "8a1b6839634ef27c",
+        "name": "tek01_T",
+        "order": 6,
+        "width": 9,
+        "height": 11,
+        "columns": [
+            {
+                "field": "date",
+                "title": "Datum",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "time",
+                "title": "Zeit",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "dist_cm",
+                "title": "Abstand (cm)",
+                "width": "26%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "ta",
+                "title": "Temp. (°C)",
+                "width": "23%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 1060,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "06d47e08bd565be2",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor2",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-02",
+        "x": 870,
+        "y": 460,
+        "wires": [
+            [
+                "8ff622e8130d6fe0"
+            ]
+        ]
+    },
+    {
+        "id": "114f59948bcf7bcc",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "name": "select all",
+        "func": "msg.topic = \"find\";\nmsg.payload = {}; // Empty object for the query filter\nreturn msg;\n\n//db.collection('test').find({})\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 460,
+        "wires": [
+            [
+                "06d47e08bd565be2"
+            ]
+        ]
+    },
+    {
+        "id": "438b32f762556b3b",
+        "type": "ui_button",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "name": "Refresh button",
+        "group": "1142dade7b6b51be",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "passthru": false,
+        "label": "Refresh",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-refresh",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 440,
+        "y": 460,
+        "wires": [
+            [
+                "becbac9540389ca4",
+                "114f59948bcf7bcc",
+                "887c11fc5c8e7492"
+            ]
+        ]
+    },
+    {
+        "id": "e78ad8ceae010c2a",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor3",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-03",
+        "x": 870,
+        "y": 500,
+        "wires": [
+            [
+                "77dc5145a30e0932"
+            ]
+        ]
+    },
+    {
+        "id": "887c11fc5c8e7492",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "name": "select all",
+        "func": "msg.topic = \"find\";\nmsg.collections = ['sensor1', 'sensor2', 'sensor3'];\nmsg.payload = {}; // Empty object for the query filter\nreturn msg;\n\n//db.collection('test').find({})\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 640,
+        "y": 500,
+        "wires": [
+            [
+                "e78ad8ceae010c2a"
+            ]
+        ]
+    },
+    {
+        "id": "15db3772115030d6",
+        "type": "ui_button",
+        "z": "267f24253b30916f",
+        "name": "Download-button",
+        "group": "1142dade7b6b51be",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "passthru": false,
+        "label": "Download",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "fa-download",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 90,
+        "y": 1060,
+        "wires": [
+            [
+                "bd024b251985c939"
+            ]
+        ]
+    },
+    {
+        "id": "bd024b251985c939",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "name": "function 3",
+        "func": "msg.topic = \"find\";\nmsg.collections = ['sensor1', 'sensor2', 'sensor3'];\nmsg.payload = {}; // Empty object for the query filter\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 300,
+        "y": 1060,
+        "wires": [
+            [
+                "48b778a935c7cf40",
+                "3b92d05aa9130a08",
+                "cfaccc3fef275f5c"
+            ]
+        ]
+    },
+    {
+        "id": "87b1eed79dea56c1",
+        "type": "csv",
+        "z": "267f24253b30916f",
+        "name": "download landrat data",
+        "sep": ";",
+        "hdrin": true,
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "devName, timestamp , date, time, dist_cm, ta",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 780,
+        "y": 1020,
+        "wires": [
+            [
+                "d920fd57dd02deac"
+            ]
+        ]
+    },
+    {
+        "id": "d920fd57dd02deac",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "name": "filePath",
+        "func": "msg.path = \"/data/sensor1.csv\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 1020,
+        "wires": [
+            [
+                "6be03c5d52a56e92"
+            ]
+        ]
+    },
+    {
+        "id": "6be03c5d52a56e92",
+        "type": "file",
+        "z": "267f24253b30916f",
+        "name": "",
+        "filename": "path",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1180,
+        "y": 1020,
+        "wires": [
+            [
+                "342689126c42cf8a"
+            ]
+        ]
+    },
+    {
+        "id": "342689126c42cf8a",
+        "type": "trigger",
+        "z": "267f24253b30916f",
+        "name": "",
+        "op1": "open",
+        "op2": "reset",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "250",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 1400,
+        "y": 1020,
+        "wires": [
+            [
+                "29f704c85ee46e8b"
+            ]
+        ]
+    },
+    {
+        "id": "29f704c85ee46e8b",
+        "type": "change",
+        "z": "267f24253b30916f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "command",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1650,
+        "y": 1020,
+        "wires": [
+            [
+                "b7cbf10f88201051"
+            ]
+        ]
+    },
+    {
+        "id": "b7cbf10f88201051",
+        "type": "ui_template",
+        "z": "267f24253b30916f",
+        "group": "aebfe53db41988ae",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function(scope) {\n        scope.$watch('msg', function(msg) {\n            if (msg.payload == \"open\") {\n                window.open(\"http://10.195.122.123:1880/data/sensor_values.csv\", \"_blank\")\n            }\n        })\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1880,
+        "y": 1020,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cfaccc3fef275f5c",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor3",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-03",
+        "x": 510,
+        "y": 1120,
+        "wires": [
+            [
+                "71ca3c7ce93d8de8"
+            ]
+        ]
+    },
+    {
+        "id": "3b92d05aa9130a08",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor2",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-02",
+        "x": 510,
+        "y": 1060,
+        "wires": [
+            [
+                "366ef13831b6ec2b"
+            ]
+        ]
+    },
+    {
+        "id": "48b778a935c7cf40",
+        "type": "mongodb4",
+        "z": "267f24253b30916f",
+        "clientNode": "eaa6092067844185",
+        "mode": "collection",
+        "collection": "sensor1",
+        "operation": "find",
+        "output": "toArray",
+        "maxTimeMS": "0",
+        "handleDocId": false,
+        "name": "tek-01",
+        "x": 510,
+        "y": 1020,
+        "wires": [
+            [
+                "87b1eed79dea56c1"
+            ]
+        ]
+    },
+    {
+        "id": "366ef13831b6ec2b",
+        "type": "csv",
+        "z": "267f24253b30916f",
+        "name": "download landrat data",
+        "sep": ";",
+        "hdrin": true,
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "devName, timestamp , date, time, dist_cm, ta",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 780,
+        "y": 1060,
+        "wires": [
+            [
+                "14e4c5c31fb6897c"
+            ]
+        ]
+    },
+    {
+        "id": "14e4c5c31fb6897c",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "name": "filePath",
+        "func": "msg.path = \"/data/sensor2.csv\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 1060,
+        "wires": [
+            [
+                "5b26af176d18ce4e"
+            ]
+        ]
+    },
+    {
+        "id": "5b26af176d18ce4e",
+        "type": "file",
+        "z": "267f24253b30916f",
+        "name": "",
+        "filename": "path",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1180,
+        "y": 1060,
+        "wires": [
+            [
+                "75cd2c18fd39321a"
+            ]
+        ]
+    },
+    {
+        "id": "75cd2c18fd39321a",
+        "type": "trigger",
+        "z": "267f24253b30916f",
+        "name": "",
+        "op1": "open",
+        "op2": "reset",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "250",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 1400,
+        "y": 1060,
+        "wires": [
+            [
+                "a230a9a1dcd65daf"
+            ]
+        ]
+    },
+    {
+        "id": "a230a9a1dcd65daf",
+        "type": "change",
+        "z": "267f24253b30916f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "command",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1650,
+        "y": 1060,
+        "wires": [
+            [
+                "a803bcac9f26ba56"
+            ]
+        ]
+    },
+    {
+        "id": "a803bcac9f26ba56",
+        "type": "ui_template",
+        "z": "267f24253b30916f",
+        "group": "aebfe53db41988ae",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function(scope) {\n        scope.$watch('msg', function(msg) {\n            if (msg.payload == \"open\") {\n                window.open(\"http://10.195.122.123:1880/data/sensor_values.csv\", \"_blank\")\n            }\n        })\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1880,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "71ca3c7ce93d8de8",
+        "type": "csv",
+        "z": "267f24253b30916f",
+        "name": "download landrat data",
+        "sep": ";",
+        "hdrin": true,
+        "hdrout": "all",
+        "multi": "one",
+        "ret": "\\n",
+        "temp": "devName, timestamp , date, time, dist_cm, ta",
+        "skip": "0",
+        "strings": true,
+        "include_empty_strings": "",
+        "include_null_values": "",
+        "x": 780,
+        "y": 1120,
+        "wires": [
+            [
+                "76b9825e66bb70a7"
+            ]
+        ]
+    },
+    {
+        "id": "76b9825e66bb70a7",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "name": "filePath",
+        "func": "msg.path = \"/data/sensor3.csv\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1000,
+        "y": 1120,
+        "wires": [
+            [
+                "2ca4b85031f1ea29"
+            ]
+        ]
+    },
+    {
+        "id": "2ca4b85031f1ea29",
+        "type": "file",
+        "z": "267f24253b30916f",
+        "name": "",
+        "filename": "path",
+        "filenameType": "msg",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "none",
+        "x": 1180,
+        "y": 1120,
+        "wires": [
+            [
+                "5c35d9cce98897f8"
+            ]
+        ]
+    },
+    {
+        "id": "5c35d9cce98897f8",
+        "type": "trigger",
+        "z": "267f24253b30916f",
+        "name": "",
+        "op1": "open",
+        "op2": "reset",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "250",
+        "extend": false,
+        "overrideDelay": false,
+        "units": "ms",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 1400,
+        "y": 1120,
+        "wires": [
+            [
+                "3fd037a81f51057f"
+            ]
+        ]
+    },
+    {
+        "id": "3fd037a81f51057f",
+        "type": "change",
+        "z": "267f24253b30916f",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "command",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1650,
+        "y": 1120,
+        "wires": [
+            [
+                "316be7186e7f01b1"
+            ]
+        ]
+    },
+    {
+        "id": "316be7186e7f01b1",
+        "type": "ui_template",
+        "z": "267f24253b30916f",
+        "group": "aebfe53db41988ae",
+        "name": "",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "format": "<script>\n    (function(scope) {\n        scope.$watch('msg', function(msg) {\n            if (msg.payload == \"open\") {\n                window.open(\"http://10.195.122.123:1880/data/sensor_values.csv\", \"_blank\")\n            }\n        })\n    })(scope);\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1880,
+        "y": 1120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a69e46d48da8968f",
+        "type": "ui_gauge",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "99a3179bc12a155a",
+        "order": 1,
+        "width": 9,
+        "height": 5,
+        "gtype": "wave",
+        "title": "Abstand",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1000,
+        "y": 660,
+        "wires": []
+    },
+    {
+        "id": "ca9a68414a468a15",
+        "type": "comment",
+        "z": "267f24253b30916f",
+        "g": "7ac3063d05911b04",
+        "name": "Chirpstack to MongoDb",
+        "info": "",
+        "x": 460,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "eab52b90.8c50f8",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "Filter Tekelek_Wasserstand_03",
+        "func": "var deviceName = msg.payload.deviceInfo.deviceName;\n\nif (deviceName === 'Tekelek_Wasserstand_03') {\n    return msg;\n}\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 660,
+        "wires": [
+            [
+                "39e4e17f.49be46"
+            ]
+        ]
+    },
+    {
+        "id": "39e4e17f.49be46",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "Extract ullage_cm",
+        "func": "var ullage_cm = msg.payload.object.ullage_cm;\n\nmsg.topic = \"Sensor03\" ;\nmsg.payload = ullage_cm;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 770,
+        "y": 660,
+        "wires": [
+            [
+                "a69e46d48da8968f",
+                "0d9fbe11f8372cf2"
+            ]
+        ]
+    },
+    {
+        "id": "5884fde412f778a6",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "filter Tekelek_Wasserstand_02",
+        "func": "var deviceName = msg.payload.deviceInfo.deviceName ;\n\n\nif (deviceName === 'Tekelek_Wasserstand_02') {\n return msg;   \n}\n\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 740,
+        "wires": [
+            [
+                "7c13f7bebf16a3c1"
+            ]
+        ]
+    },
+    {
+        "id": "7c13f7bebf16a3c1",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "ullage extraction",
+        "func": "var ullage_cm = msg.payload.object.ullage_cm;\n\nmsg.topic = \"Sensor02\" ;\nmsg.payload = ullage_cm;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 740,
+        "y": 740,
+        "wires": [
+            [
+                "1fd481330f9eb53b",
+                "3cbad6bb51e4d008"
+            ]
+        ]
+    },
+    {
+        "id": "1fd481330f9eb53b",
+        "type": "ui_gauge",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "8cc60563cd61d133",
+        "order": 1,
+        "width": 9,
+        "height": 5,
+        "gtype": "wave",
+        "title": "Abstand",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1060,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "e16e59ce449cf45f",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "Tekelek_Wasserstand_01",
+        "func": "var devName = msg.payload.deviceInfo.deviceName ;\n\nif (devName === 'Tekelek_Wasserstand_01') {\n    \n    return msg;\n}\n\n\nreturn null ;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 820,
+        "wires": [
+            [
+                "eaad3fe979205b4e"
+            ]
+        ]
+    },
+    {
+        "id": "eaad3fe979205b4e",
+        "type": "function",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "ullage_extraction",
+        "func": "var ullage_cm = msg.payload.object.ullage_cm;\n\nmsg.topic = \"Sensor01\" ;\nmsg.payload = ullage_cm;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 820,
+        "wires": [
+            [
+                "1f234d547ed14632",
+                "858c3ea4a7e2d176"
+            ]
+        ]
+    },
+    {
+        "id": "1f234d547ed14632",
+        "type": "ui_gauge",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "8a1b6839634ef27c",
+        "order": 1,
+        "width": 9,
+        "height": 5,
+        "gtype": "wave",
+        "title": "Abstand",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "diff": false,
+        "className": "",
+        "x": 1040,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "8ff622e8130d6fe0",
+        "type": "ui_table",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "group": "8cc60563cd61d133",
+        "name": "tek02_T",
+        "order": 6,
+        "width": 9,
+        "height": 11,
+        "columns": [
+            {
+                "field": "date",
+                "title": "Datum",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "time",
+                "title": "Zeit",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "dist_cm",
+                "title": "Abstand (cm)",
+                "width": "26%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "ta",
+                "title": "Temp. (°C)",
+                "width": "23%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 1060,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "77dc5145a30e0932",
+        "type": "ui_table",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "group": "99a3179bc12a155a",
+        "name": "tek03_T",
+        "order": 6,
+        "width": 9,
+        "height": 11,
+        "columns": [
+            {
+                "field": "date",
+                "title": "Datum",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "time",
+                "title": "Zeit",
+                "width": "20%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "dist_cm",
+                "title": "Abstand (cm)",
+                "width": "26%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "ta",
+                "title": "Temp. (°C)",
+                "width": "23%",
+                "align": "center",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 1060,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "ce1b9897d2e5c47f",
+        "type": "comment",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "Gauge -  Dashboard Section",
+        "info": "",
+        "x": 460,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "3cbad6bb51e4d008",
+        "type": "ui_chart",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "chart",
+        "group": "8cc60563cd61d133",
+        "order": 2,
+        "width": 9,
+        "height": 9,
+        "label": "Abstand",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "cubic",
+        "nodata": "",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "12",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#8387be"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1050,
+        "y": 780,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3ae637edebbc7503",
+        "type": "ui_button",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "8cc60563cd61d133",
+        "order": 4,
+        "width": 4,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear Chart",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 790,
+        "y": 780,
+        "wires": [
+            [
+                "3cbad6bb51e4d008"
+            ]
+        ]
+    },
+    {
+        "id": "8322f999b2d73224",
+        "type": "ui_button",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "99a3179bc12a155a",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear Chart",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 830,
+        "y": 700,
+        "wires": [
+            [
+                "0d9fbe11f8372cf2"
+            ]
+        ]
+    },
+    {
+        "id": "0d9fbe11f8372cf2",
+        "type": "ui_chart",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "chart",
+        "group": "99a3179bc12a155a",
+        "order": 2,
+        "width": 9,
+        "height": 9,
+        "label": "Abstand",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "cubic",
+        "nodata": "",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "12",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1010,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e8d5552341aa443e",
+        "type": "ui_button",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "",
+        "group": "8a1b6839634ef27c",
+        "order": 4,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear Chart",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 770,
+        "y": 860,
+        "wires": [
+            [
+                "858c3ea4a7e2d176"
+            ]
+        ]
+    },
+    {
+        "id": "858c3ea4a7e2d176",
+        "type": "ui_chart",
+        "z": "267f24253b30916f",
+        "g": "fd3496efac809f95",
+        "name": "chart",
+        "group": "8a1b6839634ef27c",
+        "order": 2,
+        "width": 9,
+        "height": 9,
+        "label": "Abstand",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "cubic",
+        "nodata": "",
+        "dot": true,
+        "ymin": "0",
+        "ymax": "100",
+        "removeOlder": "12",
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1030,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "91ef0afb1e4d3d4f",
+        "type": "comment",
+        "z": "267f24253b30916f",
+        "g": "b73381def6335361",
+        "name": "Table-Dashboard",
+        "info": "",
+        "x": 440,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "3a365266f6911e77",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "8a1b6839634ef27c",
+        "order": 3,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "b8643cc185fd90d1",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "8a1b6839634ef27c",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "e81620d92dc18c98",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "8cc60563cd61d133",
+        "order": 3,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "21546ff2da4e97dc",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "8cc60563cd61d133",
+        "order": 5,
+        "width": 3,
+        "height": 1
+    },
+    {
+        "id": "ea2d583c38b79bc8",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "99a3179bc12a155a",
+        "order": 3,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "04a3c7fd09c81bb8",
+        "type": "ui_spacer",
+        "z": "267f24253b30916f",
+        "name": "spacer",
+        "group": "99a3179bc12a155a",
+        "order": 5,
+        "width": 2,
+        "height": 1
+    },
+    {
+        "id": "5838057d01289d1c",
+        "type": "mqtt-broker",
+        "name": "data-AS",
+        "broker": "10.195.122.123",
+        "port": "",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "eaa6092067844185",
+        "type": "mongodb4-client",
+        "name": "",
+        "protocol": "mongodb",
+        "hostname": "10.195.122.123",
+        "port": "",
+        "dbName": "landrat",
+        "appName": "",
+        "authSource": "",
+        "authMechanism": "DEFAULT",
+        "tls": false,
+        "tlsCAFile": "",
+        "tlsCertificateKeyFile": "",
+        "tlsInsecure": false,
+        "connectTimeoutMS": "30000",
+        "socketTimeoutMS": "0",
+        "minPoolSize": "0",
+        "maxPoolSize": "100",
+        "maxIdleTimeMS": "0",
+        "uri": "",
+        "advanced": "{}",
+        "uriTabActive": "tab-uri-simple"
+    },
+    {
+        "id": "8a1b6839634ef27c",
+        "type": "ui_group",
+        "name": "Tekelek_Wasserstand_01",
+        "tab": "fb1dfec940dbd975",
+        "order": 1,
+        "disp": true,
+        "width": "9",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "1142dade7b6b51be",
+        "type": "ui_group",
+        "name": "",
+        "tab": "fb1dfec940dbd975",
+        "order": 4,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "aebfe53db41988ae",
+        "type": "ui_group",
+        "name": "Sensor Values",
+        "tab": "a835b380b37b8ac7",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "99a3179bc12a155a",
+        "type": "ui_group",
+        "name": "Tekelek_Wasserstand_03",
+        "tab": "fb1dfec940dbd975",
+        "order": 3,
+        "disp": true,
+        "width": 9,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "8cc60563cd61d133",
+        "type": "ui_group",
+        "name": "Tekelek_Wasserstand_02",
+        "tab": "fb1dfec940dbd975",
+        "order": 2,
+        "disp": true,
+        "width": "9",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "fb1dfec940dbd975",
+        "type": "ui_tab",
+        "name": "Abstandsensoren",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "a835b380b37b8ac7",
+        "type": "ui_tab",
+        "name": "Database",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
